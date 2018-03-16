@@ -16,7 +16,6 @@ public class Order {
 	public Order() {	
 		deliveryStatus = 0;
 		orderProducts = new ArrayList<>();
-		invoice = new Invoice(this);
 	}
 	
 	public int getId() {

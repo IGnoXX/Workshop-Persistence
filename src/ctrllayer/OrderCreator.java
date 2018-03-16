@@ -10,9 +10,11 @@ public class OrderCreator {
 	private static final double deliveryPrice = 40.0;
 	private static final double clubDiscount = 10.0;
 	private Order order;
+	private double price;
 	
 	public OrderCreator() {
 		order = new Order();
+		price = 0.0;
 	}
 	
 	public boolean addProducts(int productId, int amount) {
@@ -61,11 +63,16 @@ public class OrderCreator {
 		//	price *= 1 - (clubDiscount / 100);
 		//}
 		
-		
+		this.price = price;
 		return price;
 	}
 	public void finalizeOrder() {
 		Invoice invoice = order.getInvoice();
-		
+		if (invoice == null) {
+			invoice = new Invoice(order);
+			order.setInvoice(invoice);
+		}
+			
+		invoice.setPrice(price);
 	}
 }
