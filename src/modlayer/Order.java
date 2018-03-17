@@ -9,7 +9,7 @@ public class Order {
 	private LocalDate purchaseDate;
 	private LocalDate deliveryDate;
 	private int deliveryStatus;
-	private int customer;
+	private Customer customer;
 	private Invoice invoice;
 	private ArrayList<OrderProduct> orderProducts; 
 	
@@ -42,10 +42,10 @@ public class Order {
 	public void setDeliveryStatus(int deliveryStatus) {
 		this.deliveryStatus = deliveryStatus;
 	}
-	public int getCustomer() {
+	public Customer getCustomer() {
 		return customer;
 	}
-	public void setCustomer(int customer) {
+	public void setCustomer(Customer customer) {
 		this.customer = customer;
 	}
 	public Invoice getInvoice() {

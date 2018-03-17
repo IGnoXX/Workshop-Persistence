@@ -8,11 +8,16 @@ public class Invoice {
 	private int paymentStatus;
 	private LocalDate paymentDate;
 	private double price;
+	private double discount;
+	private double deliveryPrice;
 	private Order order;
 	
 	public Invoice(Order order) {
 		paymentStatus = 0;
+		paymentDate = null;
 		price = 0.0;
+		discount = 0.0;
+		deliveryPrice = 0.0;
 		this.order = order;
 	}
 
@@ -40,7 +45,18 @@ public class Invoice {
 	public void setPrice(double price) {
 		this.price = price;
 	}
-
+	public double getDiscount() {
+		return discount;
+	}
+	public void setDiscount(double discount) {
+		this.discount = discount;
+	}
+	public double getDeliveryPrice() {
+		return deliveryPrice;
+	}
+	public void setDeliveryPrice(double deliveryPrice) {
+		this.deliveryPrice = deliveryPrice;
+	}
 	public Order getOrder() {
 		return order;
 	}
