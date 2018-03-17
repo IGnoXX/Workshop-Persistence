@@ -51,7 +51,7 @@ public class OrderCreator {
 			amount += orderProduct.getAmount();
 		}
 		
-		order.addOrderProduct(new OrderProduct(order, product, amount));
+		order.addOrderProduct(new OrderProduct(product, amount));
 		
 		return true;
 	}	
@@ -66,7 +66,7 @@ public class OrderCreator {
 			int prevAmount = orderProduct.getAmount();
 			
 			if (prevAmount > amount) {
-				order.addOrderProduct(new OrderProduct(order, product, prevAmount - amount));
+				order.addOrderProduct(new OrderProduct(product, prevAmount - amount));
 			}
 			return true;
 		}
@@ -101,6 +101,8 @@ public class OrderCreator {
 		order.setCustomer(customer);
 		return true;
 	}
+	
+	
 	public boolean finalizeOrder() {
 		if (order.getCustomer() == null)
 			return false;

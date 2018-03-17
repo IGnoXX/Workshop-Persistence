@@ -18,6 +18,9 @@ public class Customer {
 		this.city = city;
 		this.type = 0;
 	}
+	public Customer(int id) {
+		this.id = id;
+	}
 
 	public int getId() {
 		return id;
