@@ -4,20 +4,20 @@ import modlayer.*;
 
 public class OrderProduct {
 	
-	private int product;
+	private Product product;
 	private Order order;
 	private int amount;
 
-	public OrderProduct(Order order, int product, int amount) {
+	public OrderProduct(Order order, Product product, int amount) {
 		this.order = order;
 		this.product = product;
 		this.amount = amount;
 	}
-	public OrderProduct(Order order, int product) {
+	public OrderProduct(Order order, Product product) {
 		this(order, product, 1);
 	}
 	
-	public int getProduct() {
+	public Product getProduct() {
 		return product;
 	}
 	public Order getOrder() {
@@ -27,7 +27,7 @@ public class OrderProduct {
 		return amount;
 	}
 	
-	public void setProduct(int product) {
+	public void setProduct(Product product) {
 		this.product = product;
 	}
 	public void setOrder(Order order) {
