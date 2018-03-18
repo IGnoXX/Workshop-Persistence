@@ -220,6 +220,7 @@ public class DBOrder implements IfDbOrder {
 		int rc = -1;
 		String query = "DELETE FROM Order_product WHERE order_id = '" + order.getId() + "'";
 		// System.out.println(query);
+		
 		try { // delete from employee
 			Statement stmt = con.createStatement();
 			stmt.setQueryTimeout(5);

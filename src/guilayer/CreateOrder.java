@@ -16,7 +16,10 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.AbstractTableModel;
 
+import ctrllayer.CustomerController;
+import ctrllayer.OrderCreator;
 import ctrllayer.ProductController;
+import modlayer.Customer;
 import modlayer.OrderProduct;
 import modlayer.Product;
 
@@ -32,6 +35,10 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import javax.swing.JSeparator;
+import java.awt.Color;
+import java.awt.Font;
 
 public class CreateOrder extends JFrame implements ActionListener {
 
@@ -42,7 +49,20 @@ public class CreateOrder extends JFrame implements ActionListener {
 	private ArrayList<Product> basket;
 	private JScrollPane scrollPane_1;
 	private JTable table_1;
-	private JLabel lblNewLabel;
+	private JLabel subtotal;
+	private JLabel lblNewLabel_1;
+	private JLabel lblNewLabel_2;
+	private JLabel lblDiscount;
+	private JLabel delivery;
+	private JLabel discount;
+	private JTextField txtCustomerId;
+	private JLabel lblCustomer;
+	private JLabel lblCustomerName;
+	private JButton btnFinalize;
+	private Customer c;
+	private OrderCreator oc;
+	private JLabel lblTotal;
+	private JLabel total;
 
 	/**
 	 * Launch the application.
@@ -65,6 +85,7 @@ public class CreateOrder extends JFrame implements ActionListener {
 	 */
 	public CreateOrder() {
 		pc = new ProductController();
+		oc = new OrderCreator();
 		basket = new ArrayList();
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -87,22 +108,89 @@ public class CreateOrder extends JFrame implements ActionListener {
 		contentPane.add(btnSearch);
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 47, 250, 300);
+		scrollPane.setBounds(10, 47, 250, 473);
 		contentPane.add(scrollPane);
 
 		table = new JTable(new ProductModel());
 		scrollPane.setViewportView(table);
 
 		scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(300, 47, 250, 300);
+		scrollPane_1.setBounds(503, 122, 250, 300);
 		contentPane.add(scrollPane_1);
 
 		table_1 = new JTable(new BasketModel());
 		scrollPane_1.setViewportView(table_1);
 
-		lblNewLabel = new JLabel("New label");
-		lblNewLabel.setBounds(300, 350, 172, 16);
-		contentPane.add(lblNewLabel);
+		subtotal = new JLabel("");
+		subtotal.setHorizontalAlignment(SwingConstants.RIGHT);
+		subtotal.setBounds(581, 434, 172, 16);
+		contentPane.add(subtotal);
+
+		lblNewLabel_1 = new JLabel("Subtotal:");
+		lblNewLabel_1.setBounds(503, 434, 61, 16);
+		contentPane.add(lblNewLabel_1);
+
+		lblNewLabel_2 = new JLabel("Delivery:");
+		lblNewLabel_2.setBounds(503, 451, 61, 16);
+		contentPane.add(lblNewLabel_2);
+
+		lblDiscount = new JLabel("Discount:");
+		lblDiscount.setBounds(503, 467, 61, 16);
+		contentPane.add(lblDiscount);
+
+		delivery = new JLabel("");
+		delivery.setHorizontalAlignment(SwingConstants.RIGHT);
+		delivery.setBounds(591, 451, 162, 16);
+		contentPane.add(delivery);
+
+		discount = new JLabel("");
+		discount.setHorizontalAlignment(SwingConstants.RIGHT);
+		discount.setBounds(601, 467, 152, 16);
+		contentPane.add(discount);
+
+		JSeparator separator = new JSeparator();
+		separator.setBackground(Color.BLACK);
+		separator.setForeground(Color.BLACK);
+		separator.setBounds(503, 485, 250, 6);
+		contentPane.add(separator);
+
+		lblTotal = new JLabel("Total:");
+		lblTotal.setFont(new Font("Lucida Grande", Font.PLAIN, 19));
+		lblTotal.setBounds(503, 495, 61, 16);
+		contentPane.add(lblTotal);
+
+		total = new JLabel("0");
+		total.setHorizontalAlignment(SwingConstants.RIGHT);
+		total.setFont(new Font("Lucida Grande", Font.PLAIN, 19));
+		total.setBounds(607, 495, 146, 16);
+		contentPane.add(total);
+
+		txtCustomerId = new JTextField();
+		txtCustomerId.setText("Customer ID");
+		txtCustomerId.setBounds(503, 43, 172, 26);
+		contentPane.add(txtCustomerId);
+		txtCustomerId.setColumns(10);
+
+		JButton btnSelect = new JButton("Select");
+		btnSelect.setBounds(672, 43, 81, 29);
+		btnSelect.setActionCommand("customerSelect");
+		btnSelect.addActionListener(this);
+		contentPane.add(btnSelect);
+
+		lblCustomer = new JLabel("Customer:");
+		lblCustomer.setFont(new Font("Lucida Grande", Font.PLAIN, 17));
+		lblCustomer.setBounds(503, 68, 99, 26);
+		contentPane.add(lblCustomer);
+
+		lblCustomerName = new JLabel("");
+		lblCustomerName.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblCustomerName.setFont(new Font("Lucida Grande", Font.PLAIN, 17));
+		lblCustomerName.setBounds(562, 84, 191, 26);
+		contentPane.add(lblCustomerName);
+
+		btnFinalize = new JButton("Finalize");
+		btnFinalize.setBounds(562, 535, 117, 29);
+		contentPane.add(btnFinalize);
 
 		int condition = JComponent.WHEN_IN_FOCUSED_WINDOW;
 		InputMap inputMap = table.getInputMap(condition);
@@ -123,6 +211,12 @@ public class CreateOrder extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if ("search".equals(e.getActionCommand())) {
 			((ProductModel) table.getModel()).search(txtNameOrId.getText());
+			System.out.println("what what");
+		} else if ("customerSelect".equals(e.getActionCommand())) {
+			try {
+			c = new CustomerController().getCustomer(Integer.valueOf(txtCustomerId.getText()));
+			lblCustomerName.setText(c.getName());
+			} catch(Exception ignored) {}
 		}
 	}
 
@@ -258,7 +352,7 @@ public class CreateOrder extends JFrame implements ActionListener {
 				data.get(row).setAmount((int) value);
 			calculatePrice();
 			fireTableCellUpdated(row, col);
-			
+
 			// if (col == 1) {
 			// data[row][col] = value;
 			// editor.setName(String.valueOf(value));
@@ -307,7 +401,30 @@ public class CreateOrder extends JFrame implements ActionListener {
 			for (OrderProduct orderProduct : data) {
 				price += orderProduct.getProduct().getSalesPrice() * orderProduct.getAmount();
 			}
-			CreateOrder.this.lblNewLabel.setText(String.valueOf(price));
+			CreateOrder.this.subtotal.setText(String.valueOf(price));
+			if (c != null) {
+				if (c.isPrivate() && price > 2500) {
+					delivery.setText("0");
+					discount.setText("0");
+				} else if(!c.isPrivate()&&price>1500) {
+					discount.setText(String.valueOf(0-price*0.10));
+					price*=0.90;
+					delivery.setText("45");
+					price += 45;
+				} 
+					else {
+					delivery.setText("45");
+					price += 45;
+					discount.setText("0");
+				}
+
+			} else {
+				delivery.setText("45");
+				price += 45;
+				discount.setText("0");
+			}
+			CreateOrder.this.total.setText(String.valueOf(price));
+
 		}
 	}
 }
