@@ -25,6 +25,12 @@ public class Product {
 		this.stock = stock;
 	}
 	
+	public Product(int id) {
+		this.id = id;
+	}
+	public Product() {
+	}
+
 	public void addStock(int amount) {
 		if (amount > 0)
 			this.stock += amount;

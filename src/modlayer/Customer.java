@@ -7,18 +7,21 @@ public class Customer {
 	private String address;
 	private String zipcode;
 	private String city;
+	private String country;
 	private String phone;
 	private String email;
-	private int type;
+	private boolean isPrivate;
 	
 	public Customer(String name, String address, String zipcode, String city) {
 		this.name = name;
 		this.address = address;
 		this.zipcode = zipcode;
 		this.city = city;
-		this.type = 0;
 	}
 	public Customer(int id) {
+		this.id = id;
+	}
+	public Customer() {
 		this.id = id;
 	}
 
@@ -64,10 +67,17 @@ public class Customer {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public int getType() {
-		return type;
+	public boolean isPrivate() {
+		return isPrivate;
 	}
-	public void setType(int type) {
-		this.type = type;
+	public void setPrivate(boolean is_private) {
+		this.isPrivate = is_private;
 	}
+	public String getCountry() {
+		return country;
+	}
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
 }

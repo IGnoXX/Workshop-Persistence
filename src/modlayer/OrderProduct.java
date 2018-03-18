@@ -14,6 +14,8 @@ public class OrderProduct {
 	public OrderProduct(Product product) {
 		this(product, 1);
 	}
+	public OrderProduct() {
+	}
 	
 	public Product getProduct() {
 		return product;

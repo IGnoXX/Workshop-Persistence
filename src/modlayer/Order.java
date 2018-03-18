@@ -1,16 +1,18 @@
 package modlayer;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class Order {
 
 	private int id;
-	private LocalDate purchaseDate;
-	private LocalDate deliveryDate;
+	private Date purchaseDate;
+	private Date deliveryDate;
 	private int deliveryStatus;
 	private Customer customer;
-	private Invoice invoice;
+//	private Invoice invoice;
+	private int price;
 	private ArrayList<OrderProduct> orderProducts; 
 	
 	public Order() {	
@@ -24,16 +26,16 @@ public class Order {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public LocalDate getPurchaseDate() {
+	public Date getPurchaseDate() {
 		return purchaseDate;
 	}
-	public void setPurchaseDate(LocalDate purchaseDate) {
+	public void setPurchaseDate(Date purchaseDate) {
 		this.purchaseDate = purchaseDate;
 	}
-	public LocalDate getDeliveryDate() {
+	public Date getDeliveryDate() {
 		return deliveryDate;
 	}
-	public void setDeliveryDate(LocalDate deliveryDate) {
+	public void setDeliveryDate(Date deliveryDate) {
 		this.deliveryDate = deliveryDate;
 	}
 	public int getDeliveryStatus() {
@@ -48,12 +50,12 @@ public class Order {
 	public void setCustomer(Customer customer) {
 		this.customer = customer;
 	}
-	public Invoice getInvoice() {
-		return invoice;
-	}
-	public void setInvoice(Invoice invoice) {
-		this.invoice = invoice;
-	}
+//	public Invoice getInvoice() {
+//		return invoice;
+//	}
+//	public void setInvoice(Invoice invoice) {
+//		this.invoice = invoice;
+//	}
 	public ArrayList<OrderProduct> getOrderProducts() {
 		return orderProducts;
 	}
@@ -64,4 +66,13 @@ public class Order {
 	public void removeOrderProduct(OrderProduct orderProduct) {
 		orderProducts.remove(orderProduct);
 	}
+
+	public int getPrice() {
+		return price;
+	}
+
+	public void setPrice(int price) {
+		this.price = price;
+	}
+	
 }
