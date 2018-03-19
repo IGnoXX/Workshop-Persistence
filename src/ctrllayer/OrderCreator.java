@@ -1,5 +1,7 @@
 package ctrllayer;
 
+import java.util.ArrayList;
+
 import modlayer.*;
 
 public class OrderCreator {
@@ -27,6 +29,9 @@ public class OrderCreator {
 	}
 	public double getFinalPrice() {
 		return order.getPrice() + order.getDeliveryPrice() - order.getDiscount();
+	}
+	public ArrayList<OrderProduct> getOrderProducts() {
+		return order.getOrderProducts();
 	}
 	
 	private OrderProduct getOrderProduct(Product product) {
