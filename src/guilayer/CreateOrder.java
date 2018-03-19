@@ -220,10 +220,17 @@ public class CreateOrder extends JFrame implements ActionListener {
 		}
 	}
 
-	public void addToBasket(Product product) {
-		((BasketModel) table_1.getModel()).add(product);
+//	public void addToBasket(Product product) {
+//		((BasketModel) table_1.getModel()).add(product);
+//	}
+	public void updateBasket() {
+		((BasketModel) table_1.getModel()).update();
+		subtotal.setText(String.valueOf(oc.getPrice()));
+		delivery.setText(String.valueOf(oc.getDeliveryPrice()));
+		discount.setText(String.valueOf(oc.getDiscount()));
+		total.setText(String.valueOf(oc.getFinalPrice()));
 	}
-
+	
 	class ProductModel extends AbstractTableModel {
 		private String[] columnNames = { "ID", "Name", "price", "Stock" };
 		// private Object[][] data = new Object[0][4];
@@ -275,7 +282,9 @@ public class CreateOrder extends JFrame implements ActionListener {
 		}
 
 		public boolean isCellEditable(int row, int col) {
-			CreateOrder.this.addToBasket(ddata.get(row));
+//			CreateOrder.this.addToBasket(ddata.get(row));
+			oc.addProducts(ddata.get(row).getId());
+			CreateOrder.this.updateBasket();
 			// JOptionPane.showMessageDialog(CreateOrder.this, "Addeded " +
 			// ddata.get(row).getName() + " to basket");
 			return false;
@@ -317,17 +326,25 @@ public class CreateOrder extends JFrame implements ActionListener {
 		}
 
 		public void add(Product product) {
-			boolean contains = true;
-			for (OrderProduct p : data)
-				if (p.getProduct().getId() == product.getId()) {
-					contains = false;
-					break;
-				}
-			if (contains) {
-				data.add(new OrderProduct(product, 1));
-				calculatePrice();
-				fireTableDataChanged();
-			}
+//			boolean contains = true;
+//			for (OrderProduct p : data)
+//				if (p.getProduct().getId() == product.getId()) {
+//					contains = false;
+//					break;
+//				}
+//			if (contains&&product.getStock()>0) {
+//				data.add(new OrderProduct(product, 1));
+//				calculatePrice();
+//				fireTableDataChanged();
+//			}
+			
+//			oc.addOP(product);
+//			data= oc.getOP();
+		}
+		
+		public void update() {
+			data= oc.getOrderProducts();
+			fireTableDataChanged();
 		}
 		// public void search(String name) {
 		// // data = pc.getProductsData(name, new
@@ -346,12 +363,13 @@ public class CreateOrder extends JFrame implements ActionListener {
 
 		public void setValueAt(Object value, int row, int col) {
 			// EmployeeEditor editor = new EmployeeEditor(String.valueOf(data[row][0]));
-			if ((int) value > data.get(row).getProduct().getStock())
-				data.get(row).setAmount(data.get(row).getProduct().getStock());
-			else
-				data.get(row).setAmount((int) value);
-			calculatePrice();
-			fireTableCellUpdated(row, col);
+//			if ((int) value > data.get(row).getProduct().getStock())
+//				data.get(row).setAmount(data.get(row).getProduct().getStock());
+//			else
+//				data.get(row).setAmount((int) value);
+//			calculatePrice();
+			oc.updateProducts(data.get(row).getProduct().getId(),(int) value);
+			CreateOrder.this.updateBasket();
 
 			// if (col == 1) {
 			// data[row][col] = value;
@@ -377,9 +395,9 @@ public class CreateOrder extends JFrame implements ActionListener {
 		}
 
 		public void removeFromBasket(int row) {
-			data.remove(row);
-			calculatePrice();
-			fireTableDataChanged();
+//			data.remove(row);
+			oc.removeProduct(data.get(row).getProduct().getId());
+			CreateOrder.this.updateBasket();
 		}
 
 		public Class getColumnClass(int c) {
@@ -424,7 +442,6 @@ public class CreateOrder extends JFrame implements ActionListener {
 				discount.setText("0");
 			}
 			CreateOrder.this.total.setText(String.valueOf(price));
-
 		}
 	}
 }
