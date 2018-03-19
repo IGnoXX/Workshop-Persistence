@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import modlayer.Customer;
 import modlayer.Order;
 import modlayer.OrderProduct;
+import modlayer.PaymentStatus;
 import modlayer.Product;
 
 public class DBOrder implements IfDbOrder {
@@ -22,100 +23,80 @@ public class DBOrder implements IfDbOrder {
 
 	@Override
 	public ArrayList<Order> getOrders() {
-		return searchOrders("");
+		ArrayList<Order> orders = new ArrayList<>();
+		
+		String query = "SELECT * FROM [Order]";
+		try {
+			
+			Statement st = con.createStatement();
+			st.setQueryTimeout(5);
+			
+			ResultSet results = st.executeQuery(query);
+			while (results.next()) {
+				
+				orders.add(buildOrder(results));
+			}
+		} catch (SQLException e) {
+			System.out.println("Orders were not found!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
+		}
+		
+		return orders;
 	}
-
 	@Override
 	public ArrayList<Order> searchOrders(String keyword) {
+		ArrayList<Order> orders = new ArrayList<Order>();
 
-		ResultSet results;
-		// TODO: by what do we search orders?
-		ArrayList<Order> list = new ArrayList<Order>();
-
-		String query = "SELECT * FROM [Order] LEFT JOIN Customer ON [Order].customer_id=customer.id where [Order].id LIKE '%%' OR Customer.name lIKE '%%' OR Customer.id LIKE '%%';";
-
+		String query =
+				  "SELECT [Order].* FROM [Order] "
+				+ "LEFT JOIN Customer "
+				+ "ON [Order].customer_id = [Customer].id "
+				+ "WHERE [Order].id LIKE '%?%' "
+				+ "OR Customer.name LIKE '%?%' "
+				+ "OR Customer.id LIKE '%?%'";
 		try {
-			Statement stmt = con.createStatement();
-			stmt.setQueryTimeout(5);
-			results = stmt.executeQuery(query);
-
+			PreparedStatement ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			ps.setString(1, keyword);
+			ps.setString(2, keyword);
+			ps.setString(3, keyword);
+			
+			ResultSet results = ps.executeQuery(query);
 			while (results.next()) {
-				Order o = buildOrder(results);
-				list.add(o);
+				orders.add(buildOrder(results));
 			}
-			stmt.close();
-			for (Order order : list) {
-				query = "SELECT product_id, amount FROM Order_product where id=" + String.valueOf(order.getId());
-				try {
-					stmt = con.createStatement();
-					stmt.setQueryTimeout(5);
-					results = stmt.executeQuery(query);
-					DBProduct dbp = new DBProduct();
-					while (results.next()) {
-						OrderProduct op = new OrderProduct();
-						op.setProduct(dbp.selectProduct(results.getInt(1)));
-						op.setAmount(results.getInt(2));
-						order.addOrderProduct(op);
-					}
-				} catch (Exception e) {
-					System.out.println("Query exception - select: " + e);
-					e.printStackTrace();
-				}
-
-			}
-		} // slut try
-		catch (Exception e) {
-			System.out.println("Query exception - select: " + e);
-			e.printStackTrace();
+			ps.close();
 		}
-		return list;
-		// return null;
+		catch (SQLException e) {
+			System.out.println("Orders were not found!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
+		}
+		
+		return orders;
 	}
-
 	@Override
 	public Order selectOrder(int orderId) {
-		Order order = null;
-		ResultSet results;
-		PreparedStatement ps;
-		
-		String query = "SELECT * FROM [Order] WHERE id = ?";
 
+		String query = "SELECT * FROM [Order] WHERE [Order].id = ?";
 		try {
-			ps = con.prepareStatement(query);
-			ps.setQueryTimeout(5);
 			
+			PreparedStatement ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
 			ps.setInt(1, orderId);
-			results = ps.executeQuery(query);
+			
+			ResultSet results = ps.executeQuery();
 
-			if (results.next()) {
-				
-				order = buildOrder(results);
-				ps.close();
-				
-				query = "SELECT product_id, amount FROM [Order_product] WHERE id = ?";
-				try {
-					ps = con.prepareStatement(query);
-					ps.setQueryTimeout(5);
-					results = ps.executeQuery(query);
-					
-					DBProduct dbp = new DBProduct();
-					while (results.next()) {
-						OrderProduct op = new OrderProduct();
-						op.setProduct(dbp.selectProduct(results.getInt(1)));
-						op.setAmount(results.getInt(2));
-						order.addOrderProduct(op);
-					}
-				} catch (Exception e) {
-					System.out.println("Query exception - select: " + e);
-				}
-			}
-		} catch (Exception e) {
-			System.out.println("Query exception: " + e);
+			return buildOrder(results);
+		} catch (SQLException e) {
+			System.out.println("Order was not found!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
 		}
 		
-		return order;
+		return null;
 	}
-
 	@Override
 	public int insertOrder(Order order) {
 		String query =
@@ -202,101 +183,106 @@ public class DBOrder implements IfDbOrder {
 			return -1;
 		}
 	}
-
 	@Override
 	public boolean updateOrder(Order order) {
-		//
-		// Employee empObj = emp;
-		int rc = -1;
-
-		String query = "UPDATE order SET " + "customer_id ='" + order.getCustomer().getId() + "', "
-				+ "delivery_status_id ='" + order.getDeliveryStatus() + "', " + "delivery_date ='"
-				+ order.getDeliveryDate() + "', " + "price ='" + order.getPrice() + "' " + " WHERE id = '"
-				+ order.getId() + "'";
-		System.out.println("Update query:" + query);
-		try { // update employee
-			Statement stmt = con.createStatement();
-			stmt.setQueryTimeout(5);
-			rc = stmt.executeUpdate(query);
-			stmt.close();
-
-			query = "DELETE FROM Order_product WHERE order_id = '" + order.getId() + "'";
-			// System.out.println(query);
-			try { // delete from employee
-				stmt = con.createStatement();
-				stmt.setQueryTimeout(5);
-				rc = stmt.executeUpdate(query);
-				stmt.close();
-				for (OrderProduct op : order.getOrderProducts()) {
-//						op.setAmount(44);
-					query = "INSERT INTO Order_product(product_id,order_id,amount) VALUES("+op.getProduct().getId()+","+order.getId()+"," +op.getAmount()+")";
-					// System.out.println(query);
-					try { // delete from employee
-						stmt = con.createStatement();
-						stmt.setQueryTimeout(5);
-						rc = stmt.executeUpdate(query);
-						stmt.close();
-					} // slut try
-					catch (Exception ex) {
-						System.out.println("Delete exception in employee db: " + ex);
-					}
-				}
-			} // slut try
-			catch (Exception ex) {
-				System.out.println("Delete exception in employee db: " + ex);
-			}
-		} catch (Exception ex) {
-			System.out.println("Update exception in employee db: " + ex);
+		
+		String query =
+				    "UPDATE [Order] "
+				  + "SET delivery_status_id = ? "
+				  + ",delivery_date = ? "
+				  + ",payment_status = ? "
+				  + ",payment_date = ? "
+				  + "WHERE id = ?";
+		try {
+			PreparedStatement ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			
+			ps.setInt(1, order.getDeliveryStatus());
+			ps.setDate(2, order.getDeliveryDate());
+			ps.setInt(3, order.getPaymentStatus());
+			ps.setDate(4, order.getPaymentDate());
+			ps.setInt(5, order.getId());
+			
+			boolean success = (ps.executeUpdate() != 0);
+			ps.close();
+			
+			return success;
 		}
-		if (rc >= 0)
-			return true;
+		catch (SQLException e) {
+			System.out.println("Order was not updated!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
+		}
+		
 		return false;
 	}
-
 	@Override
 	public boolean deleteOrder(Order order) {
-		int rc = -1;
-		String query = "DELETE FROM Order_product WHERE order_id = '" + order.getId() + "'";
-		// System.out.println(query);
-		
-		try { // delete from employee
-			Statement stmt = con.createStatement();
-			stmt.setQueryTimeout(5);
-			rc = stmt.executeUpdate(query);
-			stmt.close();
-			query = "DELETE FROM Order WHERE id = '" + order.getId() + "'";
-			// System.out.println(query);
-			try { // delete from employee
-				stmt = con.createStatement();
-				stmt.setQueryTimeout(5);
-				rc = stmt.executeUpdate(query);
-				stmt.close();
-			} // slut try
-			catch (Exception ex) {
-				System.out.println("Delete exception in employee db: " + ex);
-			}
-		} // slut try
-		catch (Exception ex) {
-			System.out.println("Delete exception in employee db: " + ex);
+
+		String query = "DELETE FROM [Order] WHERE id = ?";
+		try {
+			PreparedStatement ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			ps.setInt(1, order.getId());
+			
+			boolean success = (ps.executeUpdate() != 0);
+			ps.close();
+			
+			return success;
 		}
-
-		return (rc >= 0) ? true : false;
+		catch (SQLException e) {
+			System.out.println("Product stock was not decreased!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
+		}
+			
+		return false;
 	}
-
 	private Order buildOrder(ResultSet results) {
-		Order order = new Order();
-		try { // the columns from the table employee are used
+		String query = "";
+		try {
+			
+			//Order
+			Order order = new Order();
 			order.setId(results.getInt("id"));
-			order.setCustomer(new Customer(results.getInt("customer_id")));
-			// TODO: date and invoice fields setters
-			order.setDeliveryStatus(results.getInt("delivery_status_id"));
-		} catch (Exception e) {
-			System.out.println("error in building the employee object");
+			order.setPurchaseDate(results.getDate("purchase_date"));
+			order.setPrice(results.getDouble("price"));
+			order.setDiscount(results.getDouble("discount"));
+			order.setDeliveryPrice(results.getDouble("delivery_price"));
+			order.setPaymentStatus(results.getInt("payment_status_id"));
+			order.setPaymentDate(results.getDate("payment_date"));
+			order.setDeliveryStatus(results.getInt("delivery_status"));
+			order.setDeliveryDate(results.getDate("delivery_date"));
+			
+			//Customer
+			DBCustomer dbc = new DBCustomer();
+			Customer customer = dbc.selectCustomer(results.getInt("customer_id"));
+			order.setCustomer(customer);
+	
+			//OrderProducts
+			query = "SELECT product_id, amount FROM [Order_product] WHERE order_id = ?";
+			results.close();
+			PreparedStatement ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			ps.setInt(1, order.getId());
+			
+			OrderProduct op;
+			DBProduct dbp = new DBProduct();
+			results = ps.executeQuery();
+			while (results.next()) {
+				op = new OrderProduct();
+				op.setProduct(dbp.selectProduct(results.getInt(1)));
+				op.setAmount(results.getInt(2));
+				order.addOrderProduct(op);
+			}
+			
+			return order;
 		}
-		return order;
-	}
-
-	private void removeOrderProducts(int OrderID) {
-
+		catch (SQLException e) {
+			System.out.println("Order was not found!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
+		}
+		return null;
 	}
 }
