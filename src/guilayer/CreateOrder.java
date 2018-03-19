@@ -198,12 +198,8 @@ public class CreateOrder extends JFrame implements ActionListener {
 		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE");
 		actionMap.put("DELETE", new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				// ((EmployeeModel)
-				// table.getModel()).fireTableRowsDeleted(table.getSelectedRow(),
-				// table.getSelectedRow());
-				// table.removeRowSelectionInterval(table.getSelectedRow(),
-				// table.getSelectedRow());
 				((BasketModel) table_1.getModel()).removeFromBasket(table_1.getSelectedRow());
+				updateBasket();
 			}
 		});
 	}
@@ -220,9 +216,7 @@ public class CreateOrder extends JFrame implements ActionListener {
 		}
 	}
 
-//	public void addToBasket(Product product) {
-//		((BasketModel) table_1.getModel()).add(product);
-//	}
+
 	public void updateBasket() {
 		((BasketModel) table_1.getModel()).update();
 		subtotal.setText(String.valueOf(oc.getPrice()));
@@ -233,7 +227,6 @@ public class CreateOrder extends JFrame implements ActionListener {
 	
 	class ProductModel extends AbstractTableModel {
 		private String[] columnNames = { "ID", "Name", "price", "Stock" };
-		// private Object[][] data = new Object[0][4];
 		private ArrayList<Product> ddata = new ArrayList();
 
 		public int getColumnCount() {
@@ -241,7 +234,6 @@ public class CreateOrder extends JFrame implements ActionListener {
 		}
 
 		public int getRowCount() {
-			// return data.length;
 			return ddata.size();
 		}
 
@@ -250,7 +242,6 @@ public class CreateOrder extends JFrame implements ActionListener {
 		}
 
 		public Object getValueAt(int row, int col) {
-			// return data[row][col];
 			if (col == 0)
 				return ddata.get(row).getId();
 			else if (col == 1)
@@ -263,16 +254,6 @@ public class CreateOrder extends JFrame implements ActionListener {
 		}
 
 		public void search(String name) {
-			// data = pc.getProductsData(name, new
-			// String[]{"id","name","sales_price,","stock"});
-			// ArrayList<Product> results = pc.searchProducts(name);
-			// data= new Object[results.size()][4];
-			// for(int i =0;i<results.size();i++) {
-			// data[i][0]=results.get(i).getId();
-			// data[i][1]=results.get(i).getName();
-			// data[i][2]=results.get(i).getSalesPrice();
-			// data[i][3]=results.get(i).getStock();
-			// }
 			ddata = pc.searchProducts(name);
 			fireTableDataChanged();
 		}
@@ -282,20 +263,14 @@ public class CreateOrder extends JFrame implements ActionListener {
 		}
 
 		public boolean isCellEditable(int row, int col) {
-//			CreateOrder.this.addToBasket(ddata.get(row));
 			oc.addProduct(ddata.get(row).getId());
 			CreateOrder.this.updateBasket();
-			// JOptionPane.showMessageDialog(CreateOrder.this, "Addeded " +
-			// ddata.get(row).getName() + " to basket");
 			return false;
 		}
 	}
 
 	class BasketModel extends AbstractTableModel {
 		private String[] columnNames = { "ID", "Name", "price", "Amount" };
-		// private Object[][] data = new Object[0][4];
-		// private ArrayList<Product> data = new ArrayList();
-		// private ArrayList<Integer> amount = new ArrayList();
 
 		private ArrayList<OrderProduct> data = new ArrayList();
 
@@ -304,7 +279,6 @@ public class CreateOrder extends JFrame implements ActionListener {
 		}
 
 		public int getRowCount() {
-			// return data.length;
 			return data.size();
 		}
 
@@ -313,7 +287,6 @@ public class CreateOrder extends JFrame implements ActionListener {
 		}
 
 		public Object getValueAt(int row, int col) {
-			// return data[row][col];
 			if (col == 0)
 				return data.get(row).getProduct().getId();
 			else if (col == 1)
@@ -326,78 +299,20 @@ public class CreateOrder extends JFrame implements ActionListener {
 		}
 
 		public void add(Product product) {
-//			boolean contains = true;
-//			for (OrderProduct p : data)
-//				if (p.getProduct().getId() == product.getId()) {
-//					contains = false;
-//					break;
-//				}
-//			if (contains&&product.getStock()>0) {
-//				data.add(new OrderProduct(product, 1));
-//				calculatePrice();
-//				fireTableDataChanged();
-//			}
-			
-//			oc.addOP(product);
-//			data= oc.getOP();
 		}
 		
 		public void update() {
 			data= oc.getOrderProducts();
 			fireTableDataChanged();
 		}
-		// public void search(String name) {
-		// // data = pc.getProductsData(name, new
-		// // String[]{"id","name","sales_price,","stock"});
-		// // ArrayList<Product> results = pc.searchProducts(name);
-		// // data= new Object[results.size()][4];
-		// // for(int i =0;i<results.size();i++) {
-		// // data[i][0]=results.get(i).getId();
-		// // data[i][1]=results.get(i).getName();
-		// // data[i][2]=results.get(i).getSalesPrice();
-		// // data[i][3]=results.get(i).getStock();
-		// // }
-		// data = pc.searchProducts(name);
-		// fireTableDataChanged();
-		// }
 
 		public void setValueAt(Object value, int row, int col) {
-			// EmployeeEditor editor = new EmployeeEditor(String.valueOf(data[row][0]));
-//			if ((int) value > data.get(row).getProduct().getStock())
-//				data.get(row).setAmount(data.get(row).getProduct().getStock());
-//			else
-//				data.get(row).setAmount((int) value);
-//			calculatePrice();
 			oc.updateProduct(data.get(row).getProduct().getId(),(int) value);
 			CreateOrder.this.updateBasket();
-
-			// if (col == 1) {
-			// data[row][col] = value;
-			// editor.setName(String.valueOf(value));
-			// fireTableCellUpdated(row, col);
-			// } else if (col == 2) {
-			// data[row][col] = value;
-			// editor.setAddress(String.valueOf(value));
-			// fireTableCellUpdated(row, col);
-			// } else if (col == 3) {
-			// try {
-			// editor.setAccessLevel(Integer.valueOf(String.valueOf(value)));
-			// data[row][col] = value;
-			// fireTableCellUpdated(row, col);
-			// } catch (Exception e) {
-			// e.printStackTrace();
-			// }
-			// } else if (col == 4) {
-			// editor.setPassword(String.valueOf(value));
-			// // fireTableCellUpdated(row, col);
-			// data[row][col] = "updated";
-			// }
 		}
 
 		public void removeFromBasket(int row) {
-//			data.remove(row);
 			oc.removeProduct(data.get(row).getProduct().getId());
-			CreateOrder.this.updateBasket();
 		}
 
 		public Class getColumnClass(int c) {
@@ -405,8 +320,6 @@ public class CreateOrder extends JFrame implements ActionListener {
 		}
 
 		public boolean isCellEditable(int row, int col) {
-			// JOptionPane.showMessageDialog(CreateOrder.this, "Addeded " +
-			// ddata.get(row).getName() + " to basket");
 			if (col == 3) {
 				return true;
 			}
