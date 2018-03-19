@@ -2,8 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="JDBC"/>
-	<classpathentry kind="var" path="JSWING"/>
-	<classpathentry kind="var" path="JUNIT"/>
+	<classpathentry kind="lib" path="C:/Users/Ignas/Downloads/jarFiles/jarFiles/junit-4.10.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Ignas/Downloads/jarFiles/jarFiles/sqljdbc4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Ignas/Downloads/jarFiles/jarFiles/swing-layout-1.0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
