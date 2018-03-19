@@ -7,12 +7,12 @@ import java.util.ArrayList;
 public class Order {
 
 	private int id;
-	private Date purchaseDate;
-	private Date deliveryDate;
-	private int deliveryStatus;
 	private Customer customer;
+	private Date purchaseDate;
+	private int deliveryStatus;
+	private Date deliveryDate;
 	private int paymentStatus;
-	private LocalDate paymentDate;
+	private Date paymentDate;
 	private double price;
 	private double discount;
 	private double deliveryPrice;
@@ -64,10 +64,10 @@ public class Order {
 	public void setPaymentStatus(int paymentStatus) {
 		this.paymentStatus = paymentStatus;
 	}
-	public LocalDate getPaymentDate() {
+	public Date getPaymentDate() {
 		return paymentDate;
 	}
-	public void setPaymentDate(LocalDate paymentDate) {
+	public void setPaymentDate(Date paymentDate) {
 		this.paymentDate = paymentDate;
 	}
 	public double getPrice() {

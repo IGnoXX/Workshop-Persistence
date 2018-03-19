@@ -12,7 +12,8 @@ public class Customer {
 	private String email;
 	private boolean isPrivate;
 	
-	public Customer(String name, String address, String zipcode, String city) {
+	public Customer(int id, String name, String address, String zipcode, String city) {
+		this.id = id;
 		this.name = name;
 		this.address = address;
 		this.zipcode = zipcode;

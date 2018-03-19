@@ -1,8 +1,8 @@
 package ctrllayer;
 
 import java.util.ArrayList;
-
 import modlayer.*;
+import dblayer.*;
 
 public class OrderCreator {
 	
@@ -16,6 +16,8 @@ public class OrderCreator {
 		order = new Order();
 		productCtrl = new ProductController();
 		customerCtrl = new CustomerController();
+		
+		order.setCustomer(customerCtrl.getCustomer(2));
 	}
 	
 	public double getPrice() {
@@ -128,8 +130,13 @@ public class OrderCreator {
 		
 		calculatePrice();
 		
-		//DB stuff
+		int id = 0;
+		DBOrder dbOrder = new DBOrder();
+		if ((id = dbOrder.insertOrder(order)) < 1)
+			return false;
 		
+		System.out.println("Order was created!");
+		order.setId(id);
 		return true;
 	}
 }

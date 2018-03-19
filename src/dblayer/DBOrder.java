@@ -1,6 +1,7 @@
 package dblayer;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -12,9 +13,9 @@ import modlayer.OrderProduct;
 import modlayer.Product;
 
 public class DBOrder implements IfDbOrder {
+	
 	private Connection con;
 
-	/** Creates a new instance of DBEmployee */
 	public DBOrder() {
 		con = DbConnection.getInstance().getDBcon();
 	}
@@ -31,7 +32,7 @@ public class DBOrder implements IfDbOrder {
 		// TODO: by what do we search orders?
 		ArrayList<Order> list = new ArrayList<Order>();
 
-		String query = "SELECT * FROM Order where id LIKE '%" + keyword + "%'";
+		String query = "SELECT * FROM [Order] LEFT JOIN Customer ON [Order].customer_id=customer.id where [Order].id LIKE '%%' OR Customer.name lIKE '%%' OR Customer.id LIKE '%%';";
 
 		try {
 			Statement stmt = con.createStatement();
@@ -73,89 +74,132 @@ public class DBOrder implements IfDbOrder {
 
 	@Override
 	public Order selectOrder(int orderId) {
+		Order order = null;
 		ResultSet results;
-		Order order = new Order();
+		PreparedStatement ps;
+		
+		String query = "SELECT * FROM [Order] WHERE id = ?";
 
-		String query = "SELECT * FROM Order where id=" + String.valueOf(orderId);
-
-		try { // read the employee from the database
-			Statement stmt = con.createStatement();
-			stmt.setQueryTimeout(5);
-			results = stmt.executeQuery(query);
+		try {
+			ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			
+			ps.setInt(1, orderId);
+			results = ps.executeQuery(query);
 
 			if (results.next()) {
+				
 				order = buildOrder(results);
-				stmt.close();
-				query = "SELECT product_id, amount FROM Order_product where id=" + String.valueOf(order.getId());
+				ps.close();
+				
+				query = "SELECT product_id, amount FROM [Order_product] WHERE id = ?";
 				try {
-					stmt = con.createStatement();
-					stmt.setQueryTimeout(5);
-					results = stmt.executeQuery(query);
+					ps = con.prepareStatement(query);
+					ps.setQueryTimeout(5);
+					results = ps.executeQuery(query);
+					
 					DBProduct dbp = new DBProduct();
 					while (results.next()) {
 						OrderProduct op = new OrderProduct();
 						op.setProduct(dbp.selectProduct(results.getInt(1)));
 						op.setAmount(results.getInt(2));
 						order.addOrderProduct(op);
-					} // end while
-						// String super_ssn = empObj.getSupervisor().getSsn();
-						// Employee superEmp = singleWhere(" ssn = '" + super_ssn + "'", false);
-						// empObj.setSupervisor(superEmp);
-						// System.out.println("Supervisor is seleceted");
-						// // here the department has to be selected as well
+					}
 				} catch (Exception e) {
 					System.out.println("Query exception - select: " + e);
-					e.printStackTrace();
 				}
-			} else {
-				order = null;
 			}
 		} catch (Exception e) {
 			System.out.println("Query exception: " + e);
 		}
+		
 		return order;
 	}
 
 	@Override
-	public boolean insertOrder(Order order) {
-		// TODO remove getInvoice
-		int rc = -1;
-		int id = 0;
-		String query = "INSERT INTO Order(customer_id, delivery_date, price) OUTPUT Inserted.ID VALUES('"
-				+ order.getCustomer().getId() + "','" + order.getDeliveryDate() + "','" + "','" + order.getPrice()
-				+ "')";
+	public int insertOrder(Order order) {
+		String query =
+				  "INSERT INTO [Order] "
+				+ "(customer_id, price, discount, delivery_price) "
+				+ "VALUES (?, ?, ?, ?)";
+		
 		try {
-			// con.setAutoCommit(false);
-			Statement stmt = con.createStatement();
-			stmt.setQueryTimeout(5);
-			ResultSet results = stmt.executeQuery(query);
-			if (results.next())
-				id = results.getInt(1);
-			stmt.close();
-			if (id != 0) {
-				for (OrderProduct op : order.getOrderProducts()) {
-					query = "INSERT INTO Order_product(product_id, order_id, amount) VALUES('" + op.getProduct().getId()
-							+ "','" + id + "','" + op.getAmount() + "')";
-					try {
-						stmt = con.createStatement();
-						stmt.setQueryTimeout(5);
-						rc = stmt.executeUpdate(query);
-
-						stmt.close();
-					} // end try
-					catch (SQLException ex) {
-						System.out.println("OrderProduct was not inserted");
-						return false;
-					}
+			con.setAutoCommit(false);
+			
+			PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+			ps.setQueryTimeout(5);
+			
+			ps.setInt(1, order.getCustomer().getId());
+			ps.setDouble(2, order.getPrice());
+			ps.setDouble(3, order.getDiscount());
+			ps.setDouble(4, order.getDeliveryPrice());
+			
+			ps.executeUpdate();
+			ResultSet generatedKeys = ps.getGeneratedKeys();
+            generatedKeys.next();
+            
+            order.setId(generatedKeys.getInt(1));
+			ps.close();
+			
+			//OrderProducts
+			for (OrderProduct orderProduct : order.getOrderProducts()) {
+				int productId = orderProduct.getProduct().getId();
+				int amount = orderProduct.getAmount();
+				
+				query =   "INSERT INTO [Order_product] "
+						+ "(product_id, order_id, amount) "
+						+ "VALUES (?, ?, ?)";
+				try {
+					ps = con.prepareStatement(query);
+					ps.setQueryTimeout(5);
+					
+					ps.setInt(1, productId);
+					ps.setInt(2, order.getId());
+					ps.setInt(3, amount);
+					
+					ps.executeUpdate();
+					ps.close();
 				}
-				return true;
-			} else
-				System.out.println("order id check failed");
-			return false;
-		} // end try
-		catch (SQLException ex) {
-			System.out.println("Order was not inserted");
-			return false;
+				catch (SQLException e) {
+					System.out.println("OrderProduct was not inserted!");
+					
+					throw e;
+				}
+				
+				query =   "UPDATE [Product] "
+						+ "SET stock = stock - ? "
+						+ "WHERE (id = ?)";
+				try {
+					ps = con.prepareStatement(query);
+					ps.setQueryTimeout(5);
+					
+					ps.setInt(1, amount);
+					ps.setInt(2, productId);
+					
+					ps.executeUpdate();
+					ps.close();
+				}
+				catch (SQLException e) {
+					System.out.println("Product stock was not decreased!");
+					
+					throw e;
+				}
+			}
+			
+			con.commit();
+			
+			return order.getId();
+		}
+		catch (SQLException e) {
+			System.out.println("Order was not inserted!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
+			
+			try {
+				con.rollback();
+			} catch (SQLException ignored) {}
+			
+			return -1;
 		}
 	}
 
