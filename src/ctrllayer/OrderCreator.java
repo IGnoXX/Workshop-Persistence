@@ -43,24 +43,18 @@ public class OrderCreator {
 		
 		return null;
 	}
-	public boolean addProducts(int productId, int amount) {
+	public boolean addProduct(int productId) {
 		Product product = productCtrl.getProduct(productId);
 		if (product == null)
 			return false;
 		
-		OrderProduct orderProduct = getOrderProduct(product);
-		if (orderProduct != null) {
-			order.removeOrderProduct(orderProduct);
-			amount += orderProduct.getAmount();
-		}
-		
-		order.addOrderProduct(new OrderProduct(product, amount));
+		order.addOrderProduct(new OrderProduct(product, 1));
 		
 		calculatePrice();
 		
 		return true;
 	}
-	public boolean updateProducts(int productId, int amount) {
+	public boolean updateProduct(int productId, int amount) {
 		Product product = productCtrl.getProduct(productId);
 		if (product == null)
 			return false;
