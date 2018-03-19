@@ -190,6 +190,8 @@ public class CreateOrder extends JFrame implements ActionListener {
 
 		btnFinalize = new JButton("Finalize");
 		btnFinalize.setBounds(562, 535, 117, 29);
+		btnFinalize.setActionCommand("finish");
+		btnFinalize.addActionListener(this);
 		contentPane.add(btnFinalize);
 
 		int condition = JComponent.WHEN_IN_FOCUSED_WINDOW;
@@ -207,12 +209,14 @@ public class CreateOrder extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if ("search".equals(e.getActionCommand())) {
 			((ProductModel) table.getModel()).search(txtNameOrId.getText());
-			System.out.println("what what");
 		} else if ("customerSelect".equals(e.getActionCommand())) {
 			try {
 			c = new CustomerController().getCustomer(Integer.valueOf(txtCustomerId.getText()));
 			lblCustomerName.setText(c.getName());
 			} catch(Exception ignored) {}
+		}else if ("finish".equals(e.getActionCommand())) {
+			System.out.println("finalize order");
+oc.finalizeOrder();
 		}
 	}
 
