@@ -1,144 +1,204 @@
 package dblayer;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
 import modlayer.Customer;
+import modlayer.Order;
+import modlayer.OrderProduct;
 import modlayer.Product;
 
 public class DBProduct implements IfDbProduct {
 
 	private Connection con;
 
-	/** Creates a new instance of DBEmployee */
 	public DBProduct() {
 		con = DbConnection.getInstance().getDBcon();
 	}
 
 	@Override
 	public ArrayList<Product> getProducts() {
-		return searchProducts("");
+		ArrayList<Product> products = new ArrayList<>();
+		
+		String query = "SELECT * FROM Product";
+		try {
+			
+			Statement st = con.createStatement();
+			st.setQueryTimeout(5);
+			
+			ResultSet results = st.executeQuery(query);
+			while (results.next()) {
+				
+				products.add(buildProduct(results));
+			}
+		} catch (SQLException e) {
+			System.out.println("Products were not found!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
+		}
+		
+		return products;
 	}
-
 	@Override
 	public ArrayList<Product> searchProducts(String keyword) {
-		ResultSet results;
-		ArrayList<Product> list = new ArrayList<Product>();
+		ArrayList<Product> products = new ArrayList<>();
 
-		String query = "SELECT * FROM Product WHERE id LIKE '%" + keyword + "%' OR name LIKE '%" + keyword + "%'";
-
-		try { // read the employee from the database
-			Statement stmt = con.createStatement();
-			stmt.setQueryTimeout(5);
-			results = stmt.executeQuery(query);
-
+		String query =
+				  "SELECT * FROM Product "
+				+ "WHERE id LIKE '%?%' "
+				+ "OR name LIKE '%?%' "
+				+ "OR desc LIKE '%?%'";
+		try {
+			PreparedStatement ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			ps.setString(1, keyword);
+			ps.setString(2, keyword);
+			ps.setString(3, keyword);
+			
+			ResultSet results = ps.executeQuery(query);
 			while (results.next()) {
-				Product product = buildProduct(results);
-				list.add(product);
-			} // end while
-			stmt.close();
-		} // slut try
-		catch (Exception e) {
-			System.out.println("Query exception - select: " + e);
-			e.printStackTrace();
+				products.add(buildProduct(results));
+			}
+			ps.close();
 		}
-		return list;
+		catch (SQLException e) {
+			System.out.println("Products were not found!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
+		}
+		
+		return products;
 	}
-
 	@Override
 	public Product selectProduct(int productId) {
-		ResultSet results;
-		Product product = new Product();
 
-		String query = "SELECT * FROM Product WHERE id = " + productId;
-		System.out.println(query);
-		try { // read the employee from the database
-			Statement stmt = con.createStatement();
-			stmt.setQueryTimeout(5);
-			results = stmt.executeQuery(query);
-
-			if (results.next()) {
-				product = buildProduct(results);
-				// assocaition is to be build
-				stmt.close();
-			} else { // no employee was found
-				product = null;
-			}
-		} // end try
-		catch (Exception e) {
-			System.out.println("Query exception: " + e);
+		String query = "SELECT * FROM Product WHERE id = ?";
+		try {
+			
+			PreparedStatement ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			ps.setInt(1, productId);
+			
+			ResultSet results = ps.executeQuery();
+			if (results.next())
+				return buildProduct(results);
+		} catch (SQLException e) {
+			System.out.println("Product was not found!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
 		}
-		return product;
+		
+		return null;
 	}
-
 	@Override
 	public int insertProduct(Product product) {
-		int rc = -1;
-		String query = "INSERT INTO product(name, purchase_price, sales_price, rent_price, origin_country, description, stock)  VALUES('"
-				+ product.getName() + "','" + product.getPurchasePrice() + "','" + product.getSalesPrice() + "','"
-				+ product.getRentPrice() + "','" + product.getCountryOfOrigin() + "','" + product.getDesc() + "','"
-				+ product.getStock() + "')";
-		try { // insert new employee + dependent
-			Statement stmt = con.createStatement();
-			stmt.setQueryTimeout(5);
-			rc = stmt.executeUpdate(query);
-			stmt.close();
-		} // end try
-		catch (SQLException ex) {
-			System.out.println("product ikke oprettet");
+		String query =
+				  "INSERT INTO Product "
+				+ "(name, purchase_price, sales_price, rent_price, origin_country, description, stock) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
+		
+		try {
+			PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+			ps.setQueryTimeout(5);
+			
+			ps.setString(1, product.getName());
+			ps.setDouble(2, product.getPurchasePrice());
+			ps.setDouble(3, product.getSalesPrice());
+			ps.setDouble(4, product.getRentPrice());
+			ps.setString(5, product.getCountryOfOrigin());
+			ps.setString(6,  product.getDesc());
+			ps.setInt(7,  product.getStock());
+			ps.setInt(8, product.getMinStock());
+			
+			ps.executeUpdate();
+			ResultSet generatedKeys = ps.getGeneratedKeys();
+            generatedKeys.next();
+            
+            product.setId(generatedKeys.getInt(1));
+			ps.close();
+			
+			return product.getId();
 		}
-		return (rc);
+		catch (SQLException e) {
+			System.out.println("Product was not inserted!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
+		}
+		
+		return -1;
 	}
-
 	@Override
 	public boolean updateProduct(Product product) {
-		// Product empObj = emp;
-		int rc = -1;
-
-		String query = "UPDATE product SET " + "name ='" + product.getName() + "', " + "purchase_price ='"
-				+ product.getPurchasePrice() + "', " + "sales_price ='" + product.getSalesPrice() + "', "
-				+ "rent_price ='" + product.getRentPrice() + "', " + "origin_country ='" + product.getCountryOfOrigin()
-				+ "', " + "description ='" + product.getDesc() + "', " + "stock ='" + product.getStock() + "', "
-				+ " WHERE id = '" + product.getId() + "'";
-		System.out.println("Update query:" + query);
-		try { // update employee
-			Statement stmt = con.createStatement();
-			stmt.setQueryTimeout(5);
-			rc = stmt.executeUpdate(query);
-
-			stmt.close();
-		} // slut try
-		catch (Exception ex) {
-			System.out.println("Update exception in employee db: " + ex);
+		
+		String query =
+				    "UPDATE Product "
+				  + "SET name = ? "
+				  + ",purchase_price = ? "
+				  + ",sales_price = ? "
+				  + ",rent_price = ? "
+				  + ",origin_country = ? "
+				  + ",description = ? "
+				  + ",stock = ? "
+				  + ",min_stock = ? "
+				  + "WHERE id = ?";
+		try {
+			PreparedStatement ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			
+			ps.setString(1, product.getName());
+			ps.setDouble(2, product.getPurchasePrice());
+			ps.setDouble(3, product.getSalesPrice());
+			ps.setDouble(4, product.getRentPrice());
+			ps.setString(5, product.getCountryOfOrigin());
+			ps.setString(6,  product.getDesc());
+			ps.setInt(7,  product.getStock());
+			ps.setInt(8, product.getMinStock());
+			ps.setInt(9, product.getId());
+			
+			boolean success = (ps.executeUpdate() != 0);
+			ps.close();
+			
+			return success;
 		}
-		return (rc >= 0) ? true : false;
+		catch (SQLException e) {
+			System.out.println("Product was not updated!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
+		}
+		
+		return false;
 	}
-
 	@Override
 	public boolean deleteProduct(Product product) {
-		int rc = -1;
 
-		String query = "DELETE FROM Product WHERE id = '" + product.getId() + "'";
-		// System.out.println(query);
-		try { // delete from employee
-			Statement stmt = con.createStatement();
-			stmt.setQueryTimeout(5);
-			rc = stmt.executeUpdate(query);
-			stmt.close();
-		} // slut try
-		catch (Exception ex) {
-			System.out.println("Delete exception in employee db: " + ex);
+		String query = "DELETE FROM Product WHERE id = ?";
+		try {
+			PreparedStatement ps = con.prepareStatement(query);
+			ps.setQueryTimeout(5);
+			ps.setInt(1, product.getId());
+			
+			boolean success = (ps.executeUpdate() != 0);
+			ps.close();
+			
+			return success;
 		}
-
-		return (rc >= 0) ? true : false;
+		catch (SQLException e) {
+			System.out.println("Product stock was not decreased!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
+		}
+			
+		return false;
 	}
-
 	private Product buildProduct(ResultSet results) {
-		Product product = new Product();
-		try { // the columns from the table employee are used
+		String query = "";
+		try {
+
+			Product product = new Product();
 			product.setId(results.getInt("id"));
 			product.setName(results.getString("name"));
 			product.setPurchasePrice(results.getDouble("purchase_price"));
@@ -147,9 +207,15 @@ public class DBProduct implements IfDbProduct {
 			product.setCountryOfOrigin(results.getString("origin_country"));
 			product.setDesc(results.getString("description"));
 			product.setStock(results.getInt("stock"));
-		} catch (Exception e) {
-			System.out.println("error in building the employee object");
+			product.setMinStock(results.getInt("min_stock"));
+			
+			return product;
 		}
-		return product;
+		catch (SQLException e) {
+			System.out.println("Product was not found!");
+			System.out.println(e.getMessage());
+			System.out.println(query);
+		}
+		return null;
 	}
 }

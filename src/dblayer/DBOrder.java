@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import modlayer.Customer;
 import modlayer.Order;
 import modlayer.OrderProduct;
-import modlayer.PaymentStatus;
 import modlayer.Product;
 
 public class DBOrder implements IfDbOrder {
@@ -87,8 +86,8 @@ public class DBOrder implements IfDbOrder {
 			ps.setInt(1, orderId);
 			
 			ResultSet results = ps.executeQuery();
-
-			return buildOrder(results);
+			if(results.next())
+				return buildOrder(results);
 		} catch (SQLException e) {
 			System.out.println("Order was not found!");
 			System.out.println(e.getMessage());
@@ -231,7 +230,7 @@ public class DBOrder implements IfDbOrder {
 			return success;
 		}
 		catch (SQLException e) {
-			System.out.println("Product stock was not decreased!");
+			System.out.println("Order was not deleted!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 		}
