@@ -51,25 +51,39 @@ public class OrderCreator {
 		
 		order.addOrderProduct(new OrderProduct(product, amount));
 		
+		calculatePrice();
+		
 		return true;
-	}	
-	public boolean removeProducts(int productId, int amount) {
+	}
+	public boolean updateProducts(int productId, int amount) {
 		Product product = productCtrl.getProduct(productId);
 		if (product == null)
 			return false;
 		
 		OrderProduct orderProduct = getOrderProduct(product);
-		if (orderProduct != null) {
-			order.removeOrderProduct(orderProduct);
-			int prevAmount = orderProduct.getAmount();
-			
-			if (prevAmount > amount) {
-				order.addOrderProduct(new OrderProduct(product, prevAmount - amount));
-			}
-			return true;
-		}
+		if (orderProduct == null)
+			return false;
 		
-		return false;
+		order.removeOrderProduct(orderProduct);
+		orderProduct.setAmount(amount);
+		order.addOrderProduct(orderProduct);
+		
+		calculatePrice();
+		
+		return true;
+	}
+	public boolean removeProduct(int productId) {
+		Product product = productCtrl.getProduct(productId);
+		if (product == null)
+			return false;
+		
+		OrderProduct orderProduct = getOrderProduct(product);
+		if (orderProduct == null)
+			return false;
+		
+		order.removeOrderProduct(orderProduct);
+		
+		return true;
 	}
 	private void calculatePrice() {
 		double price = 0;
@@ -80,12 +94,12 @@ public class OrderCreator {
 			price += orderProduct.getProduct().getSalesPrice() * orderProduct.getAmount();
 		}
 		
-		//if (order.getCustomer().getType() != 0) {
-		//	if(price < 2500.0) {
+		if (order.getCustomer().isPrivate()) {
+			if(price < 2500.0) {
 				deliveryPrice = OrderCreator.deliveryPrice;
-		//}} else if (price >= 1500.0) {
-		//	discount = price * (1 - (clubDiscount / 100);
-		//}
+		}} else if (price >= 1500.0) {
+			discount = price * (1 - (OrderCreator.clubDiscountPercentage / 100));
+		}
 		
 		order.setPrice(price);
 		order.setDiscount(discount);
