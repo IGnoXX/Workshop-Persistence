@@ -36,7 +36,7 @@ public class OrderCreator {
 	
 	private OrderProduct getOrderProduct(Product product) {
 		for (OrderProduct orderProduct : order.getOrderProducts()) {
-			if (orderProduct.getProduct() == product) {
+			if (orderProduct.getProduct().equals(product)) {
 				return orderProduct;
 			}
 		}
@@ -46,6 +46,9 @@ public class OrderCreator {
 	public boolean addProduct(int productId) {
 		Product product = productCtrl.getProduct(productId);
 		if (product == null)
+			return false;
+		
+		if (getOrderProduct(product) != null)
 			return false;
 		
 		order.addOrderProduct(new OrderProduct(product, 1));
@@ -61,6 +64,9 @@ public class OrderCreator {
 		
 		OrderProduct orderProduct = getOrderProduct(product);
 		if (orderProduct == null)
+			return false;
+		
+		if (amount < 1 || product.getStock() < amount)
 			return false;
 		
 		order.removeOrderProduct(orderProduct);
@@ -93,7 +99,7 @@ public class OrderCreator {
 			price += orderProduct.getProduct().getSalesPrice() * orderProduct.getAmount();
 		}
 		
-		if (order.getCustomer().isPrivate()) {
+		if (order.getCustomer() != null && order.getCustomer().isPrivate()) {
 			if(price < 2500.0) {
 				deliveryPrice = OrderCreator.deliveryPrice;
 		}} else if (price >= 1500.0) {
