@@ -7,28 +7,26 @@ public class OrderCreator {
 	private static final double deliveryPrice = 40.0;
 	private static final double clubDiscountPercentage = 10.0;
 	private Order order;
-	private Invoice invoice;
 	private ProductController productCtrl;
 	private CustomerController customerCtrl;
 	
 	public OrderCreator() {
 		order = new Order();
-		invoice = new Invoice(order);
 		productCtrl = new ProductController();
 		customerCtrl = new CustomerController();
 	}
 	
 	public double getPrice() {
-		return invoice.getPrice();
+		return order.getPrice();
 	}
 	public double getDiscount() {
-		return invoice.getDiscount();
+		return order.getDiscount();
 	}
 	public double getDeliveryPrice() {
-		return invoice.getDeliveryPrice();
+		return order.getDeliveryPrice();
 	}
 	public double getFinalPrice() {
-		return invoice.getPrice() + invoice.getDeliveryPrice() - invoice.getDiscount();
+		return order.getPrice() + order.getDeliveryPrice() - order.getDiscount();
 	}
 	
 	private OrderProduct getOrderProduct(Product product) {
@@ -89,9 +87,9 @@ public class OrderCreator {
 		//	discount = price * (1 - (clubDiscount / 100);
 		//}
 		
-		invoice.setPrice(price);
-		invoice.setDiscount(discount);
-		invoice.setDeliveryPrice(deliveryPrice);
+		order.setPrice(price);
+		order.setDiscount(discount);
+		order.setDeliveryPrice(deliveryPrice);
 	}
 	public boolean selectCustomer(int customerId) {
 		Customer customer = customerCtrl.getCustomer(customerId);

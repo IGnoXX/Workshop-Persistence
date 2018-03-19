@@ -11,12 +11,20 @@ public class Order {
 	private Date deliveryDate;
 	private int deliveryStatus;
 	private Customer customer;
-//	private Invoice invoice;
-	private int price;
+	private int paymentStatus;
+	private LocalDate paymentDate;
+	private double price;
+	private double discount;
+	private double deliveryPrice;
 	private ArrayList<OrderProduct> orderProducts; 
 	
 	public Order() {	
 		deliveryStatus = 0;
+		paymentStatus = 0;
+		paymentDate = null;
+		price = 0.0;
+		discount = 0.0;
+		deliveryPrice = 0.0;
 		orderProducts = new ArrayList<>();
 	}
 	
@@ -50,12 +58,36 @@ public class Order {
 	public void setCustomer(Customer customer) {
 		this.customer = customer;
 	}
-//	public Invoice getInvoice() {
-//		return invoice;
-//	}
-//	public void setInvoice(Invoice invoice) {
-//		this.invoice = invoice;
-//	}
+	public int getPaymentStatus() {
+		return paymentStatus;
+	}
+	public void setPaymentStatus(int paymentStatus) {
+		this.paymentStatus = paymentStatus;
+	}
+	public LocalDate getPaymentDate() {
+		return paymentDate;
+	}
+	public void setPaymentDate(LocalDate paymentDate) {
+		this.paymentDate = paymentDate;
+	}
+	public double getPrice() {
+		return price;
+	}
+	public void setPrice(double price) {
+		this.price = price;
+	}
+	public double getDiscount() {
+		return discount;
+	}
+	public void setDiscount(double discount) {
+		this.discount = discount;
+	}
+	public double getDeliveryPrice() {
+		return deliveryPrice;
+	}
+	public void setDeliveryPrice(double deliveryPrice) {
+		this.deliveryPrice = deliveryPrice;
+	}
 	public ArrayList<OrderProduct> getOrderProducts() {
 		return orderProducts;
 	}
@@ -66,13 +98,4 @@ public class Order {
 	public void removeOrderProduct(OrderProduct orderProduct) {
 		orderProducts.remove(orderProduct);
 	}
-
-	public int getPrice() {
-		return price;
-	}
-
-	public void setPrice(int price) {
-		this.price = price;
-	}
-	
 }

@@ -22,7 +22,6 @@ public class Customer {
 		this.id = id;
 	}
 	public Customer() {
-		this.id = id;
 	}
 
 	public int getId() {

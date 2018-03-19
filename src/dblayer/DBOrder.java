@@ -41,9 +41,8 @@ public class DBOrder implements IfDbOrder {
 			while (results.next()) {
 				Order o = buildOrder(results);
 				list.add(o);
-			} // end while
+			}
 			stmt.close();
-			// The supervisor and department is to be build as well
 			for (Order order : list) {
 				query = "SELECT product_id, amount FROM Order_product where id=" + String.valueOf(order.getId());
 				try {
@@ -56,12 +55,7 @@ public class DBOrder implements IfDbOrder {
 						op.setProduct(dbp.selectProduct(results.getInt(1)));
 						op.setAmount(results.getInt(2));
 						order.addOrderProduct(op);
-					} // end while
-						// String super_ssn = empObj.getSupervisor().getSsn();
-						// Employee superEmp = singleWhere(" ssn = '" + super_ssn + "'", false);
-						// empObj.setSupervisor(superEmp);
-						// System.out.println("Supervisor is seleceted");
-						// // here the department has to be selected as well
+					}
 				} catch (Exception e) {
 					System.out.println("Query exception - select: " + e);
 					e.printStackTrace();
