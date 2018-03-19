@@ -283,7 +283,7 @@ public class CreateOrder extends JFrame implements ActionListener {
 
 		public boolean isCellEditable(int row, int col) {
 //			CreateOrder.this.addToBasket(ddata.get(row));
-			oc.addProducts(ddata.get(row).getId());
+			oc.addProduct(ddata.get(row).getId());
 			CreateOrder.this.updateBasket();
 			// JOptionPane.showMessageDialog(CreateOrder.this, "Addeded " +
 			// ddata.get(row).getName() + " to basket");
@@ -368,7 +368,7 @@ public class CreateOrder extends JFrame implements ActionListener {
 //			else
 //				data.get(row).setAmount((int) value);
 //			calculatePrice();
-			oc.updateProducts(data.get(row).getProduct().getId(),(int) value);
+			oc.updateProduct(data.get(row).getProduct().getId(),(int) value);
 			CreateOrder.this.updateBasket();
 
 			// if (col == 1) {
