@@ -78,10 +78,11 @@ public class DBCustomer implements IfDbCustomer {
 	@Override
 	public int insertCustomer(Customer customer) {
 		int rc = -1;
-		String query = "INSERT INTO product(name, address, zip_Code, city, country, phone, email, stock)  VALUES('"
+		String query = "INSERT INTO customer(name, address, zip_Code, city, country, phone, email, is_private)  VALUES('"
 				+ customer.getName() + "','" + customer.getAddress() + "','" + customer.getZipcode() + "','"
 				+ customer.getCity() + "','" + customer.getCountry() + "','" + customer.getPhone() + "','"
 				+ customer.getEmail() + "','" + (customer.isPrivate() ? "1" : "0") + "')";
+		System.out.println(query);
 		try { // insert new employee + dependent
 			Statement stmt = con.createStatement();
 			stmt.setQueryTimeout(5);
