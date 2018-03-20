@@ -117,16 +117,16 @@ public class OrderCreator {
 		order.setDiscount(discount);
 		order.setDeliveryPrice(deliveryPrice);
 	}
-	public boolean selectCustomer(int customerId) {
+	public Customer selectCustomer(int customerId) {
 		Customer customer = customerCtrl.getCustomer(customerId);
 		if (customer == null)
-			return false;
+			return null;
 		
 		order.setCustomer(customer);
 		
 		calculatePrice();
 		
-		return true;
+		return customer;
 	}
 	
 	public boolean finalizeOrder() {

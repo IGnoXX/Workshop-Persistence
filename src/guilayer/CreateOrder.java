@@ -59,7 +59,7 @@ public class CreateOrder extends JFrame implements ActionListener {
 	private JLabel lblCustomer;
 	private JLabel lblCustomerName;
 	private JButton btnFinalize;
-	private Customer c;
+//	private Customer c;
 	private OrderCreator oc;
 	private JLabel lblTotal;
 	private JLabel total;
@@ -203,15 +203,14 @@ public class CreateOrder extends JFrame implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				setVisible(false); // you can't see me!
 				dispose();
-				//TODO: uncomment this line
-				//new ManageProduct().setVisible(true);
+				new ManageProduct();
 			}
 		});
 
 		btnManageProducts = new JButton("Manage Products");
 		btnManageProducts.setBounds(143, 608, 139, 29);
 		contentPane.add(btnManageProducts);
-		btnManageCustomers.addActionListener(new ActionListener() {
+		btnManageProducts.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setVisible(false); // you can't see me!
 				dispose();
@@ -236,8 +235,10 @@ public class CreateOrder extends JFrame implements ActionListener {
 			((ProductModel) table.getModel()).search(txtNameOrId.getText());
 		} else if ("customerSelect".equals(e.getActionCommand())) {
 			try {
-				c = new CustomerController().getCustomer(Integer.valueOf(txtCustomerId.getText()));
-				lblCustomerName.setText(c.getName());
+//				c = new CustomerController().getCustomer(Integer.valueOf(txtCustomerId.getText()));
+//				oc.selectCustomer(c.getId());
+				lblCustomerName.setText(oc.selectCustomer(Integer.valueOf(txtCustomerId.getText())).getName());
+				updateBasket();
 			} catch (Exception ignored) {
 			}
 		} else if ("finish".equals(e.getActionCommand())) {
@@ -353,36 +354,6 @@ public class CreateOrder extends JFrame implements ActionListener {
 				return true;
 			}
 			return false;
-		}
-
-		public void calculatePrice() {
-			double price = 0.0;
-
-			for (OrderProduct orderProduct : data) {
-				price += orderProduct.getProduct().getSalesPrice() * orderProduct.getAmount();
-			}
-			CreateOrder.this.subtotal.setText(String.valueOf(price));
-			if (c != null) {
-				if (c.isPrivate() && price > 2500) {
-					delivery.setText("0");
-					discount.setText("0");
-				} else if (!c.isPrivate() && price > 1500) {
-					discount.setText(String.valueOf(0 - price * 0.10));
-					price *= 0.90;
-					delivery.setText("45");
-					price += 45;
-				} else {
-					delivery.setText("45");
-					price += 45;
-					discount.setText("0");
-				}
-
-			} else {
-				delivery.setText("45");
-				price += 45;
-				discount.setText("0");
-			}
-			CreateOrder.this.total.setText(String.valueOf(price));
 		}
 	}
 }
