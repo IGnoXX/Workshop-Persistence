@@ -125,7 +125,6 @@ public class OrderCreator {
 		order.setCustomer(customer);
 		
 		calculatePrice();
-		System.out.println(customer.isPrivate());
 		
 		return customer;
 	}
