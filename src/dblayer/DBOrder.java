@@ -146,6 +146,7 @@ public class DBOrder implements IfDbOrder {
 					throw e;
 				}
 				
+				DBProduct dbp = new DBProduct();
 				query =   "UPDATE [Product] "
 						+ "SET stock = stock - ? "
 						+ "WHERE (id = ?)";

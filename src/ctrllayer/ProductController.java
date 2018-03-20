@@ -56,14 +56,20 @@ public class ProductController {
 			return null;
 		
 		product.setId(id);
-		products.add(product);
+		products = dbProduct.getProducts();
 		return product;
 	}
 	public boolean updateProduct(Product product) {
-		return dbProduct.updateProduct(product);
+		boolean success = dbProduct.updateProduct(product);
+		products = dbProduct.getProducts();
+		
+		return success;
 	}
 	public boolean deleteProduct(Product product) {
-		return dbProduct.deleteProduct(product);
+		boolean success = dbProduct.deleteProduct(product);
+		products = dbProduct.getProducts();
+		
+		return success;
 	}
 
 }
