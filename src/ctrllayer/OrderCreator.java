@@ -90,22 +90,27 @@ public class OrderCreator {
 		
 		order.removeOrderProduct(orderProduct);
 		
+		calculatePrice();
+		
 		return true;
 	}
 	private void calculatePrice() {
-		double price = 0;
-		double discount = 0;
-		double deliveryPrice = 0;
+		double price = 0.0;
+		double discount = 0.0;
+		double deliveryPrice = OrderCreator.deliveryPrice;
 		
 		for (OrderProduct orderProduct : order.getOrderProducts()) {
 			price += orderProduct.getProduct().getSalesPrice() * orderProduct.getAmount();
 		}
 		
-		if (order.getCustomer() != null && order.getCustomer().isPrivate()) {
-			if(price < 2500.0) {
-				deliveryPrice = OrderCreator.deliveryPrice;
-		}} else if (price >= 1500.0) {
-			discount = price * (1 - (OrderCreator.clubDiscountPercentage / 100));
+		if (order.getCustomer() != null) {
+			if (order.getCustomer().isPrivate()) {
+				if (price >= 2500.0) {
+					deliveryPrice = 0.0;
+				}
+			} else if (price >= 1500.0){
+				discount = price * (OrderCreator.clubDiscountPercentage / 100);
+			}
 		}
 		
 		order.setPrice(price);
@@ -118,9 +123,11 @@ public class OrderCreator {
 			return false;
 		
 		order.setCustomer(customer);
+		
+		calculatePrice();
+		
 		return true;
 	}
-	
 	
 	public boolean finalizeOrder() {
 		if (order.getCustomer() == null)
