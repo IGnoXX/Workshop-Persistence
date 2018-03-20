@@ -203,8 +203,7 @@ public class CreateOrder extends JFrame implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				setVisible(false); // you can't see me!
 				dispose();
-				//TODO: uncomment this line
-				//new ManageProduct().setVisible(true);
+				new ManageProduct();
 			}
 		});
 
@@ -353,36 +352,6 @@ public class CreateOrder extends JFrame implements ActionListener {
 				return true;
 			}
 			return false;
-		}
-
-		public void calculatePrice() {
-			double price = 0.0;
-
-			for (OrderProduct orderProduct : data) {
-				price += orderProduct.getProduct().getSalesPrice() * orderProduct.getAmount();
-			}
-			CreateOrder.this.subtotal.setText(String.valueOf(price));
-			if (c != null) {
-				if (c.isPrivate() && price > 2500) {
-					delivery.setText("0");
-					discount.setText("0");
-				} else if (!c.isPrivate() && price > 1500) {
-					discount.setText(String.valueOf(0 - price * 0.10));
-					price *= 0.90;
-					delivery.setText("45");
-					price += 45;
-				} else {
-					delivery.setText("45");
-					price += 45;
-					discount.setText("0");
-				}
-
-			} else {
-				delivery.setText("45");
-				price += 45;
-				discount.setText("0");
-			}
-			CreateOrder.this.total.setText(String.valueOf(price));
 		}
 	}
 }
