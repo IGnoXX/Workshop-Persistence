@@ -59,7 +59,7 @@ public class CreateOrder extends JFrame implements ActionListener {
 	private JLabel lblCustomer;
 	private JLabel lblCustomerName;
 	private JButton btnFinalize;
-	private Customer c;
+//	private Customer c;
 	private OrderCreator oc;
 	private JLabel lblTotal;
 	private JLabel total;
@@ -235,8 +235,10 @@ public class CreateOrder extends JFrame implements ActionListener {
 			((ProductModel) table.getModel()).search(txtNameOrId.getText());
 		} else if ("customerSelect".equals(e.getActionCommand())) {
 			try {
-				c = new CustomerController().getCustomer(Integer.valueOf(txtCustomerId.getText()));
-				lblCustomerName.setText(c.getName());
+//				c = new CustomerController().getCustomer(Integer.valueOf(txtCustomerId.getText()));
+//				oc.selectCustomer(c.getId());
+				lblCustomerName.setText(oc.selectCustomer(Integer.valueOf(txtCustomerId.getText())).getName());
+				updateBasket();
 			} catch (Exception ignored) {
 			}
 		} else if ("finish".equals(e.getActionCommand())) {
