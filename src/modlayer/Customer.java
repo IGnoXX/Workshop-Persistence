@@ -12,12 +12,16 @@ public class Customer {
 	private String email;
 	private boolean isPrivate;
 	
-	public Customer(int id, String name, String address, String zipcode, String city) {
+	public Customer(int id, String name, String address, String zipcode, String city, String country, String phone, String email, boolean isPrivate) {
 		this.id = id;
 		this.name = name;
 		this.address = address;
 		this.zipcode = zipcode;
 		this.city = city;
+		this.country = country;
+		this.phone = phone;
+		this.email = email;
+		this.isPrivate = isPrivate;
 	}
 	public Customer(int id) {
 		this.id = id;
@@ -27,6 +31,14 @@ public class Customer {
 
 	public int getId() {
 		return id;
+	}
+	
+	public boolean getIsPrivate() {
+		return isPrivate;
+	}
+	
+	public void setIsPrivate(boolean isPrivate) {
+		this.isPrivate = isPrivate;
 	}
 	public void setId(int id) {
 		this.id = id;
