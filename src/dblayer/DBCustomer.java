@@ -103,7 +103,7 @@ public class DBCustomer implements IfDbCustomer {
 				+ customer.getAddress() + "', " + "zip_Code ='" + customer.getZipcode() + "', " + "city ='"
 				+ customer.getCity() + "', " + "country ='" + customer.getCountry() + "', " + "phone ='"
 				+ customer.getPhone() + "', " + "email ='" + customer.getEmail() + "', " + "is_private ='"
-				+ (customer.isPrivate() ? "1" : "0") + "', " + " WHERE id = '" + customer.getId() + "'";
+				+ (customer.isPrivate() ? "1" : "0") + "' " + " WHERE id = '" + customer.getId() + "'";
 		System.out.println("Update query:" + query);
 		try { // update employee
 			Statement stmt = con.createStatement();

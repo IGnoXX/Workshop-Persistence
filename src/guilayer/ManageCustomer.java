@@ -41,6 +41,7 @@ import javax.swing.event.ChangeEvent;
 import java.awt.event.InputMethodListener;
 import java.awt.event.InputMethodEvent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 public class ManageCustomer extends JFrame {
 	
 	private CustomerController customerController = new CustomerController();
@@ -202,8 +203,10 @@ public class ManageCustomer extends JFrame {
 	    		if( !txt_name.getText().equals("") && !txt_address.getText().equals("") && !txt_zipcode.getText().equals("") && !txt_city.getText().equals("")
 	    				&& !txt_country.getText().equals("") && !txt_phone.getText().equals("") && !txt_mail.getText().equals("")) {
 	    			
-	    			customerController.createCustomer(txt_name.getText(), txt_address.getText(), txt_zipcode.getText(), txt_city.getText(), txt_country.getText(), 
-	    					txt_phone.getText(), txt_mail.getText(), rdbtnYes.isSelected());
+	    			if(customerController.createCustomer(txt_name.getText(), txt_address.getText(), txt_zipcode.getText(), txt_city.getText(), txt_country.getText(), 
+	    					txt_phone.getText(), txt_mail.getText(), rdbtnYes.isSelected()))
+						JOptionPane.showMessageDialog(ManageCustomer.this, "Customer has been created", "Confirmation",
+								JOptionPane.PLAIN_MESSAGE);
 	    			
 	    		} else {
 	    			System.out.println("Some data is missing");
@@ -375,6 +378,11 @@ public class ManageCustomer extends JFrame {
 					customer.setEmail(txt_eMail.getText());
 					customer.setIsPrivate(rdbtn_ePrivateCustomerYes.isSelected());
 					customer.setZipcode(txt_eZipcode.getText());
+					if(customerController.updateCustomer(customer))
+						JOptionPane.showMessageDialog(ManageCustomer.this,
+		    				    "Customer has been updated",
+		    				    "Confirmation",
+		    				    JOptionPane.PLAIN_MESSAGE);
 				}
 	    	}
 	    });
@@ -388,6 +396,10 @@ public class ManageCustomer extends JFrame {
 	    		Customer customer = customerController.getCustomer(Integer.parseInt(txt_customerId.getText()));
 				if(customer != null ) {
 					customerController.deleteCustomer(customer.getId());
+					JOptionPane.showMessageDialog(ManageCustomer.this,
+	    				    "Customer has been deleted",
+	    				    "Confirmation",
+	    				    JOptionPane.PLAIN_MESSAGE);
 				}
 			}
 	    });

@@ -78,7 +78,13 @@ public class CustomerController {
 		catch (Exception e) {
 			System.out.println("Error in createCustomer(), can't create new customer");
 			return false;
-		}
+		}	
+	}
+	
+	public boolean updateCustomer(Customer customer) {
+		boolean success = dbCustomer.updateCustomer(customer);
+		customers = dbCustomer.getCustomers();
 		
+		return success;
 	}
 }
