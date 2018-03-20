@@ -249,9 +249,9 @@ public class DBOrder implements IfDbOrder {
 			order.setPrice(results.getDouble("price"));
 			order.setDiscount(results.getDouble("discount"));
 			order.setDeliveryPrice(results.getDouble("delivery_price"));
-			order.setPaymentStatus(results.getInt("payment_status_id"));
+			order.setPaymentStatus(results.getInt("payment_status"));
 			order.setPaymentDate(results.getDate("payment_date"));
-			order.setDeliveryStatus(results.getInt("delivery_status"));
+			order.setDeliveryStatus(results.getInt("delivery_status_id"));
 			order.setDeliveryDate(results.getDate("delivery_date"));
 			
 			//Customer
