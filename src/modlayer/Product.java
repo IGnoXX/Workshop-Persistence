@@ -24,6 +24,17 @@ public class Product {
 		this.minStock = minStock;
 		this.stock = stock;
 	}
+	public Product(String name, double purchasePrice, double salesPrice, double rentPrice,
+			String countryOfOrigin, String desc, int minStock,int stock) {
+		this.name = name;
+		this.purchasePrice = purchasePrice;
+		this.salesPrice = salesPrice;
+		this.rentPrice = rentPrice;
+		this.countryOfOrigin = countryOfOrigin;
+		this.desc = desc;
+		this.minStock = minStock;
+		this.stock = stock;
+	}
 	
 	public Product(int id) {
 		this.id = id;

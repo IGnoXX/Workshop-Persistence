@@ -4,23 +4,38 @@ import java.awt.Font;
 import java.awt.Label;
 
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 
+import ctrllayer.ProductController;
+import modlayer.Product;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.SpinnerNumberModel;
+
 public class EditProduct extends JPanel {
 
+    private ProductController productCtrl;
 	private JTextField txt_productId;
-    private JRadioButton rdbtn_ePrivateCustomerYes;
-    private JRadioButton rdbtn_ePrivateCustomerNo;
-    private JButton btnDelete;
-    private JButton btnUpdate;
-    private JTextField txt_name;
-    private JTextField txt_desc;
-    private JTextField txt_originCountry;
+    private JButton btn_search;
+	private JTextField txt_name;
+	private JTextField txt_desc;
+	private JTextField txt_originCountry;
+	private JSpinner spr_purchasePrice;
+	private JSpinner spr_salesPrice;
+	private JSpinner spr_rentPrice;
+	private JSpinner spr_stock;
+	private JSpinner spr_minStock;
+    private JButton btn_delete;
+    private JButton btn_update;
+    private Product product;
 	
 	public EditProduct() {
+		productCtrl = new ProductController();
+		
 		setLayout(null);
 		
 		Label lbl_productId = new Label("ID");
@@ -33,7 +48,7 @@ public class EditProduct extends JPanel {
 		add(txt_productId);
 		txt_productId.setColumns(10);
 		
-		JButton btn_search = new JButton("Search");
+		btn_search = new JButton("Search");
 		btn_search.setBounds(102, 37, 89, 21);
 		add(btn_search);
 	    
@@ -72,7 +87,7 @@ public class EditProduct extends JPanel {
 	    lbl_purchasePrice.setBounds(10, 299, 129, 22);
 	    add(lbl_purchasePrice);
 	    
-	    JSpinner spr_purchasePrice = new JSpinner();
+	    spr_purchasePrice = new JSpinner();
 	    spr_purchasePrice.setBounds(10, 327, 129, 20);
 	    add(spr_purchasePrice);
 	    
@@ -81,7 +96,7 @@ public class EditProduct extends JPanel {
 	    lbl_salesPrice.setBounds(149, 299, 129, 22);
 	    add(lbl_salesPrice);
 	    
-	    JSpinner spr_salesPrice = new JSpinner();
+	    spr_salesPrice = new JSpinner();
 	    spr_salesPrice.setBounds(149, 327, 129, 20);
 	    add(spr_salesPrice);
 	    
@@ -90,7 +105,7 @@ public class EditProduct extends JPanel {
 	    lbl_rentPrice.setBounds(284, 299, 129, 22);
 	    add(lbl_rentPrice);
 	    
-	    JSpinner spr_rentPrice = new JSpinner();
+	    spr_rentPrice = new JSpinner();
 	    spr_rentPrice.setBounds(285, 327, 129, 20);
 	    add(spr_rentPrice);
 	    
@@ -99,23 +114,174 @@ public class EditProduct extends JPanel {
 	    lbl_stock.setBounds(10, 367, 129, 22);
 	    add(lbl_stock);
 	    
-	    JSpinner spr_stock = new JSpinner();
-	    spr_stock.setBounds(10, 389, 129, 20);
-	    add(spr_stock);
-	    
 	    Label lbl_minStock = new Label("Minimum stock");
 	    lbl_minStock.setFont(new Font("Dialog", Font.PLAIN, 15));
 	    lbl_minStock.setBounds(149, 363, 129, 22);
 	    add(lbl_minStock);
 	    
-	    JSpinner spr_minStock = new JSpinner();
-	    spr_minStock.setBounds(149, 389, 129, 20);
+	    btn_delete = new JButton("Delete");
+	    btn_delete.setEnabled(false);
+	    btn_delete.setBounds(614, 539, 122, 32);
+	    add(btn_delete);
+	    
+	    btn_update = new JButton("Update");
+	    btn_update.setEnabled(false);
+	    btn_update.setBounds(482, 539, 122, 32);
+	    add(btn_update);
+	    
+	    spr_stock = new JSpinner();
+	    spr_stock.setEnabled(false);
+	    spr_stock.setBounds(10, 395, 129, 20);
+	    add(spr_stock);
+	    
+	    spr_minStock = new JSpinner();
+	    spr_minStock.setEnabled(false);
+	    spr_minStock.setBounds(149, 395, 129, 20);
 	    add(spr_minStock);
 	    
-	    JButton btn_delete = new JButton("Delete");
-	    btn_delete.setEnabled(false);
-	    btn_delete.setBounds(482, 539, 122, 32);
-	    add(btn_delete);
+	    resetForm();
+	    
+		btn_search.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				product = searchProduct(txt_productId.getText().trim());
+				if (product == null) {
+					return;
+				}
+				
+				fillForm(product);
+			}
+		});
+		btn_update.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (!isFilledOut()) {
+					JOptionPane.showMessageDialog(null,
+						    "Required (*) fields must be filled out!",
+						    "Warning!",
+						    JOptionPane.WARNING_MESSAGE);
+					return;
+				}
+				
+				Product result = new Product(
+						txt_name.getText().trim(),
+						(Double)spr_purchasePrice.getValue(),
+						(Double)spr_salesPrice.getValue(),
+						(Double)spr_rentPrice.getValue(),
+						txt_originCountry.getText().trim(),
+						txt_desc.getText().trim(),
+						(Integer)spr_minStock.getValue(),
+						(Integer)spr_stock.getValue());
+				
+				if (productCtrl.updateProduct(result)) {
+					JOptionPane.showMessageDialog(null,
+						    "An error occured while updating the Order!",
+						    "Error!",
+						    JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				
+				JOptionPane.showMessageDialog(null,
+					    "The Order was successfully edited!",
+					    "Success!",
+					    JOptionPane.INFORMATION_MESSAGE);
+				
+				resetForm();
+			}
+		});
+		btn_delete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {			
+				if (productCtrl.deleteProduct(product)) {
+					JOptionPane.showMessageDialog(null,
+						    "An error occured while deleting the Order!",
+						    "Error!",
+						    JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				
+				JOptionPane.showMessageDialog(null,
+					    "The Order was successfully edited!",
+					    "Success!",
+					    JOptionPane.INFORMATION_MESSAGE);
+				
+				resetForm();
+			}
+		});
 	}
-
+	private Product searchProduct(String keyword) {
+		Product result = null;
+		int productId = -1;
+		
+		try {
+			productId = Integer.parseInt(keyword);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this.getRootPane(),
+				    "The entered value is not a valid number!",
+				    "Error!",
+				    JOptionPane.ERROR_MESSAGE);
+			return null;
+		}
+		
+		result = productCtrl.getProduct(productId);
+		if (result == null) {
+			JOptionPane.showMessageDialog(this.getRootPane(),
+				    "There is no Product with that id!",
+				    "Warning!",
+				    JOptionPane.WARNING_MESSAGE);
+			return null;
+		}
+		
+		return result;
+	}
+	private void fillForm(Product product) {
+		txt_productId.setEnabled(false);
+		btn_search.setEnabled(false);
+		
+		txt_name.setText(product.getName());
+		txt_desc.setText(product.getDesc());
+		txt_originCountry.setText(product.getCountryOfOrigin());
+		spr_purchasePrice.setValue(new Double(product.getPurchasePrice()));
+		spr_salesPrice.setValue(new Double(product.getSalesPrice()));
+		spr_rentPrice.setValue(new Double(product.getRentPrice()));
+		spr_stock.setValue(new Integer(product.getStock()));
+		spr_minStock.setValue(new Integer(product.getMinStock()));
+		
+		txt_name.setEnabled(true);
+		txt_desc.setEnabled(true);
+		txt_originCountry.setEnabled(true);
+		spr_purchasePrice.setEnabled(true);
+		spr_salesPrice.setEnabled(true);
+		spr_rentPrice.setEnabled(true);
+		spr_stock.setEnabled(true);
+		spr_minStock.setEnabled(true);
+		btn_update.setEnabled(true);
+		btn_delete.setEnabled(true);
+	}
+	private void resetForm() {
+		txt_productId.setEnabled(true);
+		btn_search.setEnabled(true);
+		
+		txt_productId.setText("");
+		txt_name.setText("");
+		txt_desc.setText("");
+		txt_originCountry.setText("");
+		spr_purchasePrice.setValue(new Double(0.0));
+		spr_salesPrice.setValue(new Double(0.0));
+		spr_rentPrice.setValue(new Double(0.0));
+		spr_stock.setValue(new Integer(0));
+		spr_minStock.setValue(new Integer(0));
+		
+		txt_name.setEnabled(false);
+		txt_desc.setEnabled(false);
+		txt_originCountry.setEnabled(false);
+		spr_purchasePrice.setEnabled(false);
+		spr_salesPrice.setEnabled(false);
+		spr_rentPrice.setEnabled(false);
+		btn_update.setEnabled(false);
+		btn_delete.setEnabled(false);
+	}
+	private boolean isFilledOut() {
+		if (txt_name.getText().trim().isEmpty())
+			return false;
+		
+		return true;
+	}
 }

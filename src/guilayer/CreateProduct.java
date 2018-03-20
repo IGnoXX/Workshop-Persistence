@@ -34,7 +34,7 @@ public class CreateProduct extends JPanel {
 		productCtrl = new ProductController();
 		
 		setLayout(null);
-
+		
 		Label lbl_name = new Label("Name *");
 		lbl_name.setFont(new Font("Dialog", Font.PLAIN, 15));
 		lbl_name.setBounds(10, 10, 129, 22);
@@ -165,7 +165,6 @@ public class CreateProduct extends JPanel {
 		return true;
 	}
 	private void resetForm() {
-		productCtrl = null;
 		txt_name.setText("");
 		txt_desc.setText("");
 		txt_originCountry.setText("");
@@ -174,8 +173,5 @@ public class CreateProduct extends JPanel {
 		spr_rentPrice.setValue(new Double(0.0));
 		spr_stock.setValue(new Double(0.0));
 		spr_minStock.setValue(new Double(0.0));
-		
-		productCtrl = new ProductController();
 	}
-	
 }
