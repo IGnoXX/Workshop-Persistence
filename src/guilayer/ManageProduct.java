@@ -18,24 +18,26 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class ManageProduct {
 
 	private JFrame frame;
 	private JPanel contentPane;
 
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ManageProduct window = new ManageProduct();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+//	public static void main(String[] args) {
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					ManageProduct window = new ManageProduct();
+//					window.frame.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 
 	public ManageProduct() {
 		initialize();
@@ -64,5 +66,16 @@ public class ManageProduct {
 		
 		JPanel editProduct = new EditProduct();
 		tabbedPane.addTab("Edit Product", null, editProduct, null);
+		
+		JButton btnBack = new JButton("Back");
+		btnBack.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				frame.setVisible(false); // you can't see me!
+				frame.dispose();
+				new CreateOrder().setVisible(true);;
+			}
+		});
+		btnBack.setBounds(15, 608, 117, 29);
+		contentPane.add(btnBack);
 	}
 }

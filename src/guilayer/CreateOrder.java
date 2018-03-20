@@ -210,7 +210,7 @@ public class CreateOrder extends JFrame implements ActionListener {
 		btnManageProducts = new JButton("Manage Products");
 		btnManageProducts.setBounds(143, 608, 139, 29);
 		contentPane.add(btnManageProducts);
-		btnManageCustomers.addActionListener(new ActionListener() {
+		btnManageProducts.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setVisible(false); // you can't see me!
 				dispose();
