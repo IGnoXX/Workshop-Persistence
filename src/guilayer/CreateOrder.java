@@ -63,6 +63,8 @@ public class CreateOrder extends JFrame implements ActionListener {
 	private OrderCreator oc;
 	private JLabel lblTotal;
 	private JLabel total;
+	private JButton btnManageCustomers;
+	private JButton btnManageProducts;
 
 	/**
 	 * Launch the application.
@@ -194,6 +196,29 @@ public class CreateOrder extends JFrame implements ActionListener {
 		btnFinalize.addActionListener(this);
 		contentPane.add(btnFinalize);
 
+		btnManageCustomers = new JButton("Manage Customers");
+		btnManageCustomers.setBounds(0, 608, 152, 29);
+		contentPane.add(btnManageCustomers);
+		btnManageCustomers.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setVisible(false); // you can't see me!
+				dispose();
+				//TODO: uncomment this line
+				//new ManageProduct().setVisible(true);
+			}
+		});
+
+		btnManageProducts = new JButton("Manage Products");
+		btnManageProducts.setBounds(143, 608, 139, 29);
+		contentPane.add(btnManageProducts);
+		btnManageCustomers.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setVisible(false); // you can't see me!
+				dispose();
+				new ManageCustomer().setVisible(true);
+			}
+		});
+
 		int condition = JComponent.WHEN_IN_FOCUSED_WINDOW;
 		InputMap inputMap = table.getInputMap(condition);
 		ActionMap actionMap = table.getActionMap();
@@ -211,15 +236,15 @@ public class CreateOrder extends JFrame implements ActionListener {
 			((ProductModel) table.getModel()).search(txtNameOrId.getText());
 		} else if ("customerSelect".equals(e.getActionCommand())) {
 			try {
-			c = new CustomerController().getCustomer(Integer.valueOf(txtCustomerId.getText()));
-			lblCustomerName.setText(c.getName());
-			} catch(Exception ignored) {}
-		}else if ("finish".equals(e.getActionCommand())) {
+				c = new CustomerController().getCustomer(Integer.valueOf(txtCustomerId.getText()));
+				lblCustomerName.setText(c.getName());
+			} catch (Exception ignored) {
+			}
+		} else if ("finish".equals(e.getActionCommand())) {
 			System.out.println("finalize order");
-oc.finalizeOrder();
+			oc.finalizeOrder();
 		}
 	}
-
 
 	public void updateBasket() {
 		((BasketModel) table_1.getModel()).update();
@@ -228,7 +253,7 @@ oc.finalizeOrder();
 		discount.setText(String.valueOf(oc.getDiscount()));
 		total.setText(String.valueOf(oc.getFinalPrice()));
 	}
-	
+
 	class ProductModel extends AbstractTableModel {
 		private String[] columnNames = { "ID", "Name", "price", "Stock" };
 		private ArrayList<Product> ddata = new ArrayList();
@@ -304,14 +329,14 @@ oc.finalizeOrder();
 
 		public void add(Product product) {
 		}
-		
+
 		public void update() {
-			data= oc.getOrderProducts();
+			data = oc.getOrderProducts();
 			fireTableDataChanged();
 		}
 
 		public void setValueAt(Object value, int row, int col) {
-			oc.updateProduct(data.get(row).getProduct().getId(),(int) value);
+			oc.updateProduct(data.get(row).getProduct().getId(), (int) value);
 			CreateOrder.this.updateBasket();
 		}
 
@@ -341,13 +366,12 @@ oc.finalizeOrder();
 				if (c.isPrivate() && price > 2500) {
 					delivery.setText("0");
 					discount.setText("0");
-				} else if(!c.isPrivate()&&price>1500) {
-					discount.setText(String.valueOf(0-price*0.10));
-					price*=0.90;
+				} else if (!c.isPrivate() && price > 1500) {
+					discount.setText(String.valueOf(0 - price * 0.10));
+					price *= 0.90;
 					delivery.setText("45");
 					price += 45;
-				} 
-					else {
+				} else {
 					delivery.setText("45");
 					price += 45;
 					discount.setText("0");
