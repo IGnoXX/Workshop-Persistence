@@ -98,8 +98,8 @@ public class DBProduct implements IfDbProduct {
 	public int insertProduct(Product product) {
 		String query =
 				  "INSERT INTO Product "
-				+ "(name, purchase_price, sales_price, rent_price, origin_country, description, stock) "
-				+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
+				+ "(name, purchase_price, sales_price, rent_price, origin_country, description, stock, min_stock) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 		
 		try {
 			PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
