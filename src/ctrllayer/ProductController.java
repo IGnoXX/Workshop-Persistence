@@ -15,12 +15,16 @@ public class ProductController {
 		products = dbProduct.getProducts();
 	}
 
+	public ArrayList<Product> getProducts() {
+		return products;
+	}
 	public ArrayList<Product> searchProducts(String keyword) {
 		ArrayList<Product> results = new ArrayList<>();
+		keyword = keyword.toLowerCase();
 		
 		for (Product product : products) {
-			if (product.getName().indexOf(keyword) > -1 ||
-				product.getDesc().indexOf(keyword) > -1 ||
+			if (product.getName().toLowerCase().indexOf(keyword) > -1 ||
+				product.getDesc().toLowerCase().indexOf(keyword) > -1 ||
 				Integer.toString(product.getId()).indexOf(keyword) > -1) {
 				results.add(product);
 			}

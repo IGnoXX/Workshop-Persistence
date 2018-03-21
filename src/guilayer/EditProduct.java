@@ -16,7 +16,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.SpinnerNumberModel;
 
-public class EditProduct extends JPanel {
+public class EditProduct extends JPanel implements ManageProductPanel {
 
     private ProductController productCtrl;
 	private JTextField txt_productId;
@@ -29,7 +29,7 @@ public class EditProduct extends JPanel {
 	private JSpinner spr_rentPrice;
 	private JSpinner spr_stock;
 	private JSpinner spr_minStock;
-    private JButton btn_delete;
+    private JButton btn_cancel;
     private JButton btn_update;
     private Product product;
 	
@@ -119,10 +119,10 @@ public class EditProduct extends JPanel {
 	    lbl_minStock.setBounds(149, 363, 129, 22);
 	    add(lbl_minStock);
 	    
-	    btn_delete = new JButton("Delete");
-	    btn_delete.setEnabled(false);
-	    btn_delete.setBounds(614, 539, 122, 32);
-	    add(btn_delete);
+	    btn_cancel = new JButton("Cancel");
+	    btn_cancel.setEnabled(false);
+	    btn_cancel.setBounds(614, 539, 122, 32);
+	    add(btn_cancel);
 	    
 	    btn_update = new JButton("Update");
 	    btn_update.setEnabled(false);
@@ -151,6 +151,12 @@ public class EditProduct extends JPanel {
 				fillForm(product);
 			}
 		});
+		btn_cancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				product = null;
+				resetForm();
+			}
+		});
 		btn_update.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (!isFilledOut()) {
@@ -162,6 +168,7 @@ public class EditProduct extends JPanel {
 				}
 				
 				Product result = new Product(
+						product.getId(),
 						txt_name.getText().trim(),
 						(Double)spr_purchasePrice.getValue(),
 						(Double)spr_salesPrice.getValue(),
@@ -171,7 +178,7 @@ public class EditProduct extends JPanel {
 						(Integer)spr_minStock.getValue(),
 						(Integer)spr_stock.getValue());
 				
-				if (productCtrl.updateProduct(result)) {
+				if (!productCtrl.updateProduct(result)) {
 					JOptionPane.showMessageDialog(null,
 						    "An error occured while updating the Order!",
 						    "Error!",
@@ -184,24 +191,7 @@ public class EditProduct extends JPanel {
 					    "Success!",
 					    JOptionPane.INFORMATION_MESSAGE);
 				
-				resetForm();
-			}
-		});
-		btn_delete.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {			
-				if (productCtrl.deleteProduct(product)) {
-					JOptionPane.showMessageDialog(null,
-						    "An error occured while deleting the Order!",
-						    "Error!",
-						    JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				
-				JOptionPane.showMessageDialog(null,
-					    "The Order was successfully edited!",
-					    "Success!",
-					    JOptionPane.INFORMATION_MESSAGE);
-				
+				product = null;
 				resetForm();
 			}
 		});
@@ -253,7 +243,7 @@ public class EditProduct extends JPanel {
 		spr_stock.setEnabled(true);
 		spr_minStock.setEnabled(true);
 		btn_update.setEnabled(true);
-		btn_delete.setEnabled(true);
+		btn_cancel.setEnabled(true);
 	}
 	private void resetForm() {
 		txt_productId.setEnabled(true);
@@ -276,12 +266,21 @@ public class EditProduct extends JPanel {
 		spr_salesPrice.setEnabled(false);
 		spr_rentPrice.setEnabled(false);
 		btn_update.setEnabled(false);
-		btn_delete.setEnabled(false);
+		btn_cancel.setEnabled(false);
 	}
 	private boolean isFilledOut() {
 		if (txt_name.getText().trim().isEmpty())
 			return false;
 		
 		return true;
+	}
+	@Override
+	public void reset() {
+		product = null;
+		resetForm();
+	}
+	@Override
+	public void reopen() {
+		productCtrl = new ProductController();
 	}
 }

@@ -17,7 +17,7 @@ import modlayer.Product;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-public class CreateProduct extends JPanel {
+public class CreateProduct extends JPanel implements ManageProductPanel {
 
 	private ProductController productCtrl;
 	private JTextField txt_name;
@@ -111,6 +111,7 @@ public class CreateProduct extends JPanel {
 	    add(lbl_minStock);
 	    
 	    spr_minStock = new JSpinner();
+	    spr_minStock.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
 	    spr_minStock.setBounds(149, 300, 129, 20);
 	    add(spr_minStock);
 	    
@@ -145,14 +146,14 @@ public class CreateProduct extends JPanel {
 				(Integer)spr_minStock.getValue());
 		if (product == null) {
 			JOptionPane.showMessageDialog(this.getRootPane(),
-				    "An error occured while creating the Order!",
+				    "An error occured while creating the Product!",
 				    "Error!",
 				    JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
 		JOptionPane.showMessageDialog(this.getRootPane(),
-			    "The Order was successfully created!",
+			    "The Product was successfully created!",
 			    "Success!",
 			    JOptionPane.INFORMATION_MESSAGE);
 		
@@ -171,7 +172,15 @@ public class CreateProduct extends JPanel {
 		spr_purchasePrice.setValue(new Double(0.0));
 		spr_salesPrice.setValue(new Double(0.0));
 		spr_rentPrice.setValue(new Double(0.0));
-		spr_stock.setValue(new Double(0.0));
-		spr_minStock.setValue(new Double(0.0));
+		spr_stock.setValue(new Integer(0));
+		spr_minStock.setValue(new Integer(0));
+	}
+	@Override
+	public void reset() {
+		resetForm();
+	}
+	@Override
+	public void reopen() {
+		productCtrl = new ProductController();
 	}
 }

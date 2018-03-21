@@ -159,10 +159,10 @@ public class DBProduct implements IfDbProduct {
 			ps.setInt(8, product.getMinStock());
 			ps.setInt(9, product.getId());
 			
-			boolean success = (ps.executeUpdate() != 0);
+			int affectedRows = ps.executeUpdate();
 			ps.close();
 			
-			return success;
+			return affectedRows > 0;
 		}
 		catch (SQLException e) {
 			System.out.println("Product was not updated!");
