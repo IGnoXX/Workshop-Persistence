@@ -60,7 +60,7 @@ public class DBProduct implements IFDBProduct {
 			ps.setString(3, keyword);
 			
 			Product product;
-			ResultSet results = ps.executeQuery(query);
+			ResultSet results = ps.executeQuery();
 			while (results.next()) {
 				product = buildProduct(results);
 				products.add(product);
