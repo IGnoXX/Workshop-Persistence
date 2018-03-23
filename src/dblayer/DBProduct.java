@@ -18,7 +18,7 @@ public class DBProduct implements IFDBProduct {
 	private Connection con;
 
 	public DBProduct() {
-		con = DBConnection.getInstance().getDBcon();
+		con = DBConnection.getInstance().getConnection();
 	}
 
 	@Override

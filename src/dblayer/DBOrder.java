@@ -18,7 +18,7 @@ public class DBOrder implements IFDBOrder {
 	private Connection con;
 
 	public DBOrder() {
-		con = DBConnection.getInstance().getDBcon();
+		con = DBConnection.getInstance().getConnection();
 	}
 
 	@Override

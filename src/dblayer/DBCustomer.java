@@ -16,7 +16,7 @@ public class DBCustomer implements IFDBCustomer {
 
 	/** Creates a new instance of DBEmployee */
 	public DBCustomer() {
-		con = DBConnection.getInstance().getDBcon();
+		con = DBConnection.getInstance().getConnection();
 	}
 
 	@Override
