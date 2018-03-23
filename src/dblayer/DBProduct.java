@@ -8,9 +8,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import dblayer.interfaces.IFDBProduct;
-import modlayer.Customer;
-import modlayer.Order;
-import modlayer.OrderProduct;
 import modlayer.Product;
 
 public class DBProduct implements IFDBProduct {
@@ -18,24 +15,26 @@ public class DBProduct implements IFDBProduct {
 	private Connection con;
 
 	public DBProduct() {
-		con = DBConnection.getInstance().getConnection();
+		con = DBConnection.getConnection();
 	}
 
 	@Override
 	public ArrayList<Product> getProducts() {
 		ArrayList<Product> products = new ArrayList<>();
-		
+
 		String query = "SELECT * FROM Product";
 		try {
 			
 			Statement st = con.createStatement();
 			st.setQueryTimeout(5);
 			
+			Product product;
 			ResultSet results = st.executeQuery(query);
 			while (results.next()) {
-				
-				products.add(buildProduct(results));
+				product = buildProduct(results);
+				products.add(product);
 			}
+			st.close();
 		} catch (SQLException e) {
 			System.out.println("Products were not found!");
 			System.out.println(e.getMessage());
@@ -60,9 +59,11 @@ public class DBProduct implements IFDBProduct {
 			ps.setString(2, keyword);
 			ps.setString(3, keyword);
 			
+			Product product;
 			ResultSet results = ps.executeQuery(query);
 			while (results.next()) {
-				products.add(buildProduct(results));
+				product = buildProduct(results);
+				products.add(product);
 			}
 			ps.close();
 		}
@@ -76,7 +77,8 @@ public class DBProduct implements IFDBProduct {
 	}
 	@Override
 	public Product selectProduct(int productId) {
-
+		Product product = null;
+		
 		String query = "SELECT * FROM Product WHERE id = ?";
 		try {
 			
@@ -85,27 +87,29 @@ public class DBProduct implements IFDBProduct {
 			ps.setInt(1, productId);
 			
 			ResultSet results = ps.executeQuery();
-			if (results.next())
-				return buildProduct(results);
+			if (results.next()) {
+				product = buildProduct(results);
+			}
 		} catch (SQLException e) {
 			System.out.println("Product was not found!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 		}
 		
-		return null;
+		return product;
 	}
 	@Override
 	public int insertProduct(Product product) {
+		int id = -1;
+		
 		String query =
 				  "INSERT INTO Product "
 				+ "(name, purchase_price, sales_price, rent_price, origin_country, description, stock, min_stock) "
 				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-		
 		try {
+			
 			PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 			ps.setQueryTimeout(5);
-			
 			ps.setString(1, product.getName());
 			ps.setDouble(2, product.getPurchasePrice());
 			ps.setDouble(3, product.getSalesPrice());
@@ -115,14 +119,15 @@ public class DBProduct implements IFDBProduct {
 			ps.setInt(7,  product.getStock());
 			ps.setInt(8, product.getMinStock());
 			
-			ps.executeUpdate();
-			ResultSet generatedKeys = ps.getGeneratedKeys();
-            generatedKeys.next();
-            
-            product.setId(generatedKeys.getInt(1));
+			if (ps.executeUpdate() > 0) {
+				ResultSet generatedKeys = ps.getGeneratedKeys();
+	            if (generatedKeys.next()) {
+	            	id = generatedKeys.getInt(1);
+		            product.setId(id);
+	            }
+			}
 			ps.close();
 			
-			return product.getId();
 		}
 		catch (SQLException e) {
 			System.out.println("Product was not inserted!");
@@ -130,10 +135,11 @@ public class DBProduct implements IFDBProduct {
 			System.out.println(query);
 		}
 		
-		return -1;
+		return id;
 	}
 	@Override
 	public boolean updateProduct(Product product) {
+		boolean success = false;
 		
 		String query =
 				    "UPDATE Product "
@@ -149,7 +155,6 @@ public class DBProduct implements IFDBProduct {
 		try {
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
-			
 			ps.setString(1, product.getName());
 			ps.setDouble(2, product.getPurchasePrice());
 			ps.setDouble(3, product.getSalesPrice());
@@ -160,10 +165,8 @@ public class DBProduct implements IFDBProduct {
 			ps.setInt(8, product.getMinStock());
 			ps.setInt(9, product.getId());
 			
-			int affectedRows = ps.executeUpdate();
+			success = ps.executeUpdate() > 0;
 			ps.close();
-			
-			return affectedRows > 0;
 		}
 		catch (SQLException e) {
 			System.out.println("Product was not updated!");
@@ -171,10 +174,11 @@ public class DBProduct implements IFDBProduct {
 			System.out.println(query);
 		}
 		
-		return false;
+		return success;
 	}
 	@Override
 	public boolean deleteProduct(Product product) {
+		boolean success = false;
 
 		String query = "DELETE FROM Product WHERE id = ?";
 		try {
@@ -182,10 +186,8 @@ public class DBProduct implements IFDBProduct {
 			ps.setQueryTimeout(5);
 			ps.setInt(1, product.getId());
 			
-			boolean success = (ps.executeUpdate() != 0);
+			success = ps.executeUpdate() > 0;
 			ps.close();
-			
-			return success;
 		}
 		catch (SQLException e) {
 			System.out.println("Product stock was not decreased!");
@@ -193,13 +195,15 @@ public class DBProduct implements IFDBProduct {
 			System.out.println(query);
 		}
 			
-		return false;
+		return success;
 	}
-	private Product buildProduct(ResultSet results) {
-		String query = "";
+	
+	private Product buildProduct(ResultSet results) throws SQLException {
+		Product product = null;
+		
 		try {
-
-			Product product = new Product();
+			
+			product = new Product();
 			product.setId(results.getInt("id"));
 			product.setName(results.getString("name"));
 			product.setPurchasePrice(results.getDouble("purchase_price"));
@@ -209,14 +213,14 @@ public class DBProduct implements IFDBProduct {
 			product.setDesc(results.getString("description"));
 			product.setStock(results.getInt("stock"));
 			product.setMinStock(results.getInt("min_stock"));
-			
-			return product;
 		}
 		catch (SQLException e) {
-			System.out.println("Product was not found!");
+			System.out.println("Product was not built!");
 			System.out.println(e.getMessage());
-			System.out.println(query);
+			
+			throw e;
 		}
-		return null;
+		
+		return product;
 	}
 }
