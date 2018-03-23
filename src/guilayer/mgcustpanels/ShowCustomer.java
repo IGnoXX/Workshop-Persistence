@@ -1,4 +1,4 @@
-package guilayer.mgprodpanels;
+package guilayer.mgcustpanels;
 
 import java.util.ArrayList;
 
@@ -6,11 +6,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
 
-import ctrllayer.ProductController;
+import ctrllayer.CustomerController;
 import guilayer.ResetablePanel;
-import modlayer.Product;
+import modlayer.Customer;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -20,16 +19,16 @@ import javax.swing.JOptionPane;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-public class ShowProduct extends JPanel implements ResetablePanel {
+public class ShowCustomer extends JPanel implements ResetablePanel {
 
-	private ProductController productCtrl;
+	private CustomerController customerCtrl;
 	private JTable table;
-	private ProductTable model;
+	private CustomerTable model;
 	private int selectedId;
 	private JButton btn_delete;
 	
-	public ShowProduct() {
-		productCtrl = new ProductController();
+	public ShowCustomer() {
+		customerCtrl = new CustomerController();
 		selectedId = -1;
 		
 		setLayout(null);
@@ -41,18 +40,18 @@ public class ShowProduct extends JPanel implements ResetablePanel {
 		table = new JTable();
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.getTableHeader().setReorderingAllowed(false);
-		model = new ProductTable();
-		model.setProducts(productCtrl.getProducts());
+		model = new CustomerTable();
+		model.setCustomers(customerCtrl.getCustomers());
 		table.setModel(model);
 		scrollPane.setViewportView(table);
 		
-		btn_delete = new JButton("Delete selected Product");
+		btn_delete = new JButton("Delete selected Customer");
 		btn_delete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				boolean success = productCtrl.deleteProduct(model.getProductAt(selectedId));
+				boolean success = customerCtrl.deleteCustomer(model.getCustomerAt(selectedId));
 				if (!success) {
 					JOptionPane.showMessageDialog(null,
-						    "An error occured while deleting the Product!",
+						    "An error occured while deleting the Customer!",
 						    "Error!",
 						    JOptionPane.ERROR_MESSAGE);
 					return;
@@ -61,7 +60,7 @@ public class ShowProduct extends JPanel implements ResetablePanel {
 				reset();
 				reopen();
 				JOptionPane.showMessageDialog(null,
-					"The Product was successfully deleted!",
+					"The Customer was successfully deleted!",
 				    "Success!",
 				    JOptionPane.INFORMATION_MESSAGE);
 			}
@@ -103,26 +102,26 @@ public class ShowProduct extends JPanel implements ResetablePanel {
 	}
 	@Override
 	public void reopen() {
-		productCtrl = new ProductController();
-		model.setProducts(productCtrl.getProducts());
+		customerCtrl = new CustomerController();
+		model.setCustomers(customerCtrl.getCustomers());
 		model.update();
 	}
-	private class ProductTable extends AbstractTableModel {
+	private class CustomerTable extends AbstractTableModel {
 		
-		private String[] columns = new String[] { "Id", "Name", "Sales Price", "Rent Price", "Stock" };
-		private ArrayList<Product> products;
+		private String[] columns = new String[] { "Id", "Name", "Phone", "Email", "Private" };
+		private ArrayList<Customer> customers;
 		
-		public ProductTable() {
-			this(new ArrayList<Product>());
+		public CustomerTable() {
+			this(new ArrayList<Customer>());
 		}
-		public ProductTable(ArrayList<Product> products) {
-			this.products = products;
+		public CustomerTable(ArrayList<Customer> customers) {
+			this.customers = customers;
 			update();
 		}
 
 		@Override
 		public int getRowCount() {
-			return products.size();
+			return customers.size();
 		}
 		@Override
 		public int getColumnCount() {
@@ -131,19 +130,19 @@ public class ShowProduct extends JPanel implements ResetablePanel {
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			
-			Product product = products.get(rowIndex);
+			Customer customer = customers.get(rowIndex);
 			
 			switch(columnIndex) {
 				case 0:
-					return product.getId();
+					return customer.getId();
 				case 1:
-					return product.getName();
+					return customer.getName();
 				case 2:
-					return product.getSalesPrice();
+					return customer.getPhone();
 				case 3:
-					return product.getRentPrice();
+					return customer.getEmail();
 				case 4:
-					return product.getStock();
+					return customer.getIsPrivate() ? "Yes" : "No";
 			}
 			
 			return null;
@@ -160,11 +159,11 @@ public class ShowProduct extends JPanel implements ResetablePanel {
 				case 1:
 					return String.class;
 				case 2:
-					return double.class;
+					return String.class;
 				case 3:
-					return double.class;
+					return String.class;
 				case 4:
-					return int.class;
+					return String.class;
 			}
 			
 			return null;
@@ -176,11 +175,11 @@ public class ShowProduct extends JPanel implements ResetablePanel {
 		public void update() {
 			fireTableDataChanged();
 		}
-		public Product getProductAt(int rowIndex) {
-			return products.get(rowIndex);
+		public Customer getCustomerAt(int rowIndex) {
+			return customers.get(rowIndex);
 		}
-		public void setProducts(ArrayList<Product> products) {
-			this.products = products;
+		public void setCustomers(ArrayList<Customer> customers) {
+			this.customers = customers;
 			update();
 		}
 	}

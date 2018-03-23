@@ -11,12 +11,13 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 
 import ctrllayer.ProductController;
+import guilayer.ResetablePanel;
 import modlayer.Product;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.SpinnerNumberModel;
 
-public class EditProduct extends JPanel implements ManageProductPanel {
+public class EditProduct extends JPanel implements ResetablePanel {
 
     private ProductController productCtrl;
 	private JTextField txt_productId;
@@ -180,14 +181,14 @@ public class EditProduct extends JPanel implements ManageProductPanel {
 				
 				if (!productCtrl.updateProduct(result)) {
 					JOptionPane.showMessageDialog(null,
-						    "An error occured while updating the Order!",
+						    "An error occured while updating the Product!",
 						    "Error!",
 						    JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				
 				JOptionPane.showMessageDialog(null,
-					    "The Order was successfully edited!",
+					    "The Product was successfully edited!",
 					    "Success!",
 					    JOptionPane.INFORMATION_MESSAGE);
 				

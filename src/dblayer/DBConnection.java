@@ -23,9 +23,9 @@ public class DBConnection
             con.setAutoCommit(true);
             dma = con.getMetaData();
             
-            System.out.println("Connection to: " + dma.getURL());
-            System.out.println("Driver: " + dma.getDriverName());
-            System.out.println("Database product name: " + dma.getDatabaseProductName());
+            //System.out.println("Connection to: " + dma.getURL());
+            //System.out.println("Driver: " + dma.getDriverName());
+            //System.out.println("Database product name: " + dma.getDatabaseProductName());
         }
         catch (SQLException e) {
             System.out.println("Problems with the connection to the database.");

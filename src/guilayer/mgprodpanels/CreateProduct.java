@@ -12,12 +12,13 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
 import ctrllayer.ProductController;
+import guilayer.ResetablePanel;
 import modlayer.Product;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-public class CreateProduct extends JPanel implements ManageProductPanel {
+public class CreateProduct extends JPanel implements ResetablePanel {
 
 	private ProductController productCtrl;
 	private JTextField txt_name;
@@ -126,7 +127,7 @@ public class CreateProduct extends JPanel implements ManageProductPanel {
 	    });
 	}
 	
-	public void createProduct() {
+	private void createProduct() {
 		if (!isFilledOut()) {
 			JOptionPane.showMessageDialog(this.getRootPane(),
 				    "Required (*) fields must be filled out!",
@@ -135,7 +136,7 @@ public class CreateProduct extends JPanel implements ManageProductPanel {
 			return;
 		}
 		
-		Product product = productCtrl.createProduct(
+		boolean success = productCtrl.createProduct(
 				txt_name.getText().trim(),
 				(Double)spr_purchasePrice.getValue(),
 				(Double)spr_salesPrice.getValue(),
@@ -144,7 +145,7 @@ public class CreateProduct extends JPanel implements ManageProductPanel {
 				txt_desc.getText().trim(),
 				(Integer)spr_stock.getValue(),
 				(Integer)spr_minStock.getValue());
-		if (product == null) {
+		if (!success) {
 			JOptionPane.showMessageDialog(this.getRootPane(),
 				    "An error occured while creating the Product!",
 				    "Error!",
