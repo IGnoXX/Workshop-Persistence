@@ -18,7 +18,7 @@ public class DBOrder implements IFDBOrder {
 	private Connection con;
 
 	public DBOrder() {
-		con = DBConnection.getInstance().getConnection();
+		con = DBConnection.getConnection();
 	}
 
 	@Override
@@ -31,11 +31,13 @@ public class DBOrder implements IFDBOrder {
 			Statement st = con.createStatement();
 			st.setQueryTimeout(5);
 			
+			Order order;
 			ResultSet results = st.executeQuery(query);
 			while (results.next()) {
-				
-				orders.add(buildOrder(results));
+				order = buildOrder(results);
+				orders.add(order);
 			}
+			st.close();
 		} catch (SQLException e) {
 			System.out.println("Orders were not found!");
 			System.out.println(e.getMessage());
@@ -62,9 +64,11 @@ public class DBOrder implements IFDBOrder {
 			ps.setString(2, keyword);
 			ps.setString(3, keyword);
 			
-			ResultSet results = ps.executeQuery(query);
+			Order order;
+			ResultSet results = ps.executeQuery();
 			while (results.next()) {
-				orders.add(buildOrder(results));
+				order = buildOrder(results);
+				orders.add(order);
 			}
 			ps.close();
 		}
@@ -78,7 +82,8 @@ public class DBOrder implements IFDBOrder {
 	}
 	@Override
 	public Order selectOrder(int orderId) {
-
+		Order order = null;
+		
 		String query = "SELECT * FROM [Order] WHERE [Order].id = ?";
 		try {
 			
@@ -87,29 +92,30 @@ public class DBOrder implements IFDBOrder {
 			ps.setInt(1, orderId);
 			
 			ResultSet results = ps.executeQuery();
-			if(results.next())
-				return buildOrder(results);
+			if (results.next()) {
+				order = buildOrder(results);
+			}
 		} catch (SQLException e) {
 			System.out.println("Order was not found!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 		}
 		
-		return null;
+		return order;
 	}
 	@Override
 	public int insertOrder(Order order) {
+		int id = -1;
+		
 		String query =
 				  "INSERT INTO [Order] "
 				+ "(customer_id, price, discount, delivery_price) "
 				+ "VALUES (?, ?, ?, ?)";
-		
 		try {
-			con.setAutoCommit(false);
+			DBConnection.startTransaction();
 			
 			PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 			ps.setQueryTimeout(5);
-			
 			ps.setInt(1, order.getCustomer().getId());
 			ps.setDouble(2, order.getPrice());
 			ps.setDouble(3, order.getDiscount());
@@ -119,7 +125,8 @@ public class DBOrder implements IFDBOrder {
 			ResultSet generatedKeys = ps.getGeneratedKeys();
             generatedKeys.next();
             
-            order.setId(generatedKeys.getInt(1));
+            id = generatedKeys.getInt(1);
+            order.setId(id);
 			ps.close();
 			
 			//OrderProducts
@@ -133,9 +140,8 @@ public class DBOrder implements IFDBOrder {
 				try {
 					ps = con.prepareStatement(query);
 					ps.setQueryTimeout(5);
-					
 					ps.setInt(1, productId);
-					ps.setInt(2, order.getId());
+					ps.setInt(2, id);
 					ps.setInt(3, amount);
 					
 					ps.executeUpdate();
@@ -147,14 +153,12 @@ public class DBOrder implements IFDBOrder {
 					throw e;
 				}
 				
-				DBProduct dbp = new DBProduct();
 				query =   "UPDATE [Product] "
 						+ "SET stock = stock - ? "
 						+ "WHERE (id = ?)";
 				try {
 					ps = con.prepareStatement(query);
 					ps.setQueryTimeout(5);
-					
 					ps.setInt(1, amount);
 					ps.setInt(2, productId);
 					
@@ -168,24 +172,21 @@ public class DBOrder implements IFDBOrder {
 				}
 			}
 			
-			con.commit();
-			
-			return order.getId();
+			DBConnection.commitTransaction();
 		}
 		catch (SQLException e) {
 			System.out.println("Order was not inserted!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 			
-			try {
-				con.rollback();
-			} catch (SQLException ignored) {}
-			
-			return -1;
+			DBConnection.rollbackTransaction();
 		}
+		
+		return id;
 	}
 	@Override
 	public boolean updateOrder(Order order) {
+		boolean success = false;
 		
 		String query =
 				    "UPDATE [Order] "
@@ -197,17 +198,14 @@ public class DBOrder implements IFDBOrder {
 		try {
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
-			
 			ps.setInt(1, order.getDeliveryStatus());
 			ps.setDate(2, order.getDeliveryDate());
 			ps.setInt(3, order.getPaymentStatus());
 			ps.setDate(4, order.getPaymentDate());
 			ps.setInt(5, order.getId());
 			
-			boolean success = (ps.executeUpdate() != 0);
+			success = ps.executeUpdate() > 0;
 			ps.close();
-			
-			return success;
 		}
 		catch (SQLException e) {
 			System.out.println("Order was not updated!");
@@ -215,21 +213,20 @@ public class DBOrder implements IFDBOrder {
 			System.out.println(query);
 		}
 		
-		return false;
+		return success;
 	}
 	@Override
 	public boolean deleteOrder(Order order) {
-
+		boolean success = false;
+		
 		String query = "DELETE FROM [Order] WHERE id = ?";
 		try {
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
 			ps.setInt(1, order.getId());
 			
-			boolean success = (ps.executeUpdate() != 0);
+			success = ps.executeUpdate() > 0;
 			ps.close();
-			
-			return success;
 		}
 		catch (SQLException e) {
 			System.out.println("Order was not deleted!");
@@ -237,14 +234,16 @@ public class DBOrder implements IFDBOrder {
 			System.out.println(query);
 		}
 			
-		return false;
+		return success;
 	}
-	private Order buildOrder(ResultSet results) {
+	private Order buildOrder(ResultSet results) throws SQLException {
+		Order order = null;
+		
 		String query = "";
 		try {
 			
 			//Order
-			Order order = new Order();
+			order = new Order();
 			order.setId(results.getInt("id"));
 			order.setPurchaseDate(results.getDate("purchase_date"));
 			order.setPrice(results.getDouble("price"));
@@ -262,28 +261,27 @@ public class DBOrder implements IFDBOrder {
 	
 			//OrderProducts
 			query = "SELECT product_id, amount FROM [Order_product] WHERE order_id = ?";
-			results.close();
 			PreparedStatement ps = con.prepareStatement(query);
 			ps.setQueryTimeout(5);
 			ps.setInt(1, order.getId());
 			
-			OrderProduct op;
+			OrderProduct orderProduct;
 			DBProduct dbp = new DBProduct();
 			results = ps.executeQuery();
 			while (results.next()) {
-				op = new OrderProduct();
-				op.setProduct(dbp.selectProduct(results.getInt(1)));
-				op.setAmount(results.getInt(2));
-				order.addOrderProduct(op);
+				orderProduct = new OrderProduct();
+				orderProduct.setProduct(dbp.selectProduct(results.getInt(1)));
+				orderProduct.setAmount(results.getInt(2));
+				order.addOrderProduct(orderProduct);
 			}
-			
-			return order;
+			ps.close();
 		}
 		catch (SQLException e) {
 			System.out.println("Order was not found!");
 			System.out.println(e.getMessage());
 			System.out.println(query);
 		}
-		return null;
+		
+		return order;
 	}
 }
