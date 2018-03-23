@@ -41,7 +41,9 @@ public class ProductController {
 		
 		return null;
 	}
-	public Product createProduct(String name, double purchasePrice, double salesPrice, double rentPrice, String countryOfOrigin, String desc, int stock, int minStock) {
+	public boolean createProduct(String name, double purchasePrice, double salesPrice, double rentPrice, String countryOfOrigin, String desc, int stock, int minStock) {
+		boolean success = false;
+		
 		Product product = new Product();
 		product.setName(name);
 		product.setPurchasePrice(purchasePrice);
@@ -52,28 +54,31 @@ public class ProductController {
 		product.setStock(stock);
 		product.setMinStock(minStock);
 		
-		return createProduct(product);
-	}
-	public Product createProduct(Product product) {
 		int id = dbProduct.insertProduct(product);
-		if (id < 1)
-			return null;
+		if (id > 0) {
+			success = true;
+			
+			product.setId(id);
+			products.add(product);
+		}
 		
-		product.setId(id);
-		products = dbProduct.getProducts();
-		return product;
+		return success;
 	}
 	public boolean updateProduct(Product product) {
 		boolean success = dbProduct.updateProduct(product);
-		products = dbProduct.getProducts();
+		if (success) {
+			products.remove(getProduct(product.getId()));
+			products.add(product);
+		}
 		
 		return success;
 	}
 	public boolean deleteProduct(Product product) {
 		boolean success = dbProduct.deleteProduct(product);
-		products = dbProduct.getProducts();
+		if (success) {
+			products.remove(product);
+		}
 		
 		return success;
 	}
-
 }

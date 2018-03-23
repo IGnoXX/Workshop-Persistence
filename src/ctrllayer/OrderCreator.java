@@ -16,8 +16,6 @@ public class OrderCreator {
 		order = new Order();
 		productCtrl = new ProductController();
 		customerCtrl = new CustomerController();
-		
-		order.setCustomer(customerCtrl.getCustomer(2));
 	}
 	
 	public double getPrice() {
@@ -135,9 +133,7 @@ public class OrderCreator {
 		if (order.getOrderProducts().size() == 0)
 			return false;
 		
-		calculatePrice();
-		
-		int id = 0;
+		int id = -1;
 		DBOrder dbOrder = new DBOrder();
 		if ((id = dbOrder.insertOrder(order)) < 1)
 			return false;
