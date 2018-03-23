@@ -2,7 +2,7 @@ package dblayer;
 
 import java.sql.*;
 
-public class DbConnection
+public class DBConnection
 {   //Constants used to get access to the database
 	//SQL Server
 	//private static final String  driver = "jdbc:sqlserver://kraka.ucn.dk:1433";
@@ -22,9 +22,9 @@ public class DbConnection
    
     private DatabaseMetaData dma;
     private static Connection con;
-    private static DbConnection  instance = null;
+    private static DBConnection  instance = null;
 
-    private DbConnection()
+    private DBConnection()
     {
     	String url = "jdbc:sqlserver://kraka.ucn.dk:1433;user=dmaj0917_1067624;password=Password1!;databaseName=dmaj0917_1067624";
     	
@@ -60,11 +60,11 @@ public class DbConnection
        return con;
     }
     
-    public static DbConnection getInstance()
+    public static DBConnection getInstance()
     {
         if (instance == null)
         {
-          instance = new DbConnection();
+          instance = new DBConnection();
         }
         return instance;
     }

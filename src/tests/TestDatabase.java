@@ -1,13 +1,13 @@
-package Test;
+package tests;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import dblayer.DbConnection;
+import dblayer.DBConnection;
 
 public class TestDatabase {
 
-	DbConnection dbCon = DbConnection.getInstance();
+	DBConnection dbCon = DBConnection.getInstance();
 	
 	@Test
 	public void testDatabaseConnection() {

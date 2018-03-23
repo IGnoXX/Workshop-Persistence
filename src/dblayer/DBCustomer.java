@@ -6,16 +6,17 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import dblayer.interfaces.IFDBCustomer;
 import modlayer.Customer;
 import modlayer.Product;
 
-public class DBCustomer implements IfDbCustomer {
+public class DBCustomer implements IFDBCustomer {
 
 	private Connection con;
 
 	/** Creates a new instance of DBEmployee */
 	public DBCustomer() {
-		con = DbConnection.getInstance().getDBcon();
+		con = DBConnection.getInstance().getDBcon();
 	}
 
 	@Override

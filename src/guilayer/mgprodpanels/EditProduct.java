@@ -1,4 +1,4 @@
-package guilayer;
+package guilayer.mgprodpanels;
 
 import java.awt.Font;
 import java.awt.Label;

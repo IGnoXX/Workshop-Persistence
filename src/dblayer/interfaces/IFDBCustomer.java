@@ -1,9 +1,9 @@
-package dblayer;
+package dblayer.interfaces;
 
 import java.util.ArrayList;
 import modlayer.*;
 
-public interface IfDbCustomer {
+public interface IFDBCustomer {
 
     public ArrayList<Customer> getCustomers();
     public ArrayList<Customer> searchCustomers(String keyword);

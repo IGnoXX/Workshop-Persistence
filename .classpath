@@ -6,8 +6,8 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/VGrzo/OneDrive - University College Nordjylland/Lectures/Semester_2/Programming/jarFiles/junit-4.10.jar"/>
-	<classpathentry kind="lib" path="C:/Users/VGrzo/OneDrive - University College Nordjylland/Lectures/Semester_2/Programming/jarFiles/sqljdbc4.jar"/>
-	<classpathentry kind="lib" path="C:/Users/VGrzo/OneDrive - University College Nordjylland/Lectures/Semester_2/Programming/jarFiles/swing-layout-1.0.1.jar"/>
+	<classpathentry kind="var" path="JSWING"/>
+	<classpathentry kind="var" path="JUNIT"/>
+	<classpathentry kind="var" path="JDBC"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

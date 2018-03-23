@@ -1,10 +1,10 @@
-package dblayer;
+package dblayer.interfaces;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import modlayer.*;
 
-public interface IfDbOrder {
+public interface IFDBOrder {
 
     public ArrayList<Order> getOrders();
     public ArrayList<Order> searchOrders(String keyword);

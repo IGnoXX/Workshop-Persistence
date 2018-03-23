@@ -7,17 +7,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import dblayer.interfaces.IFDBOrder;
 import modlayer.Customer;
 import modlayer.Order;
 import modlayer.OrderProduct;
 import modlayer.Product;
 
-public class DBOrder implements IfDbOrder {
+public class DBOrder implements IFDBOrder {
 	
 	private Connection con;
 
 	public DBOrder() {
-		con = DbConnection.getInstance().getDBcon();
+		con = DBConnection.getInstance().getDBcon();
 	}
 
 	@Override
