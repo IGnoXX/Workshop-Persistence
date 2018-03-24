@@ -9,7 +9,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 
 import ctrllayer.ProductController;
-import guilayer.ResetablePanel;
+import guilayer.contentpanels.ResetablePanel;
 import modlayer.Product;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;

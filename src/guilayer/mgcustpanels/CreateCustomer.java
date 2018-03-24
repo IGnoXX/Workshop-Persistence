@@ -13,7 +13,7 @@ import javax.swing.SpinnerNumberModel;
 
 import ctrllayer.CustomerController;
 import ctrllayer.ProductController;
-import guilayer.ResetablePanel;
+import guilayer.contentpanels.ResetablePanel;
 import modlayer.Product;
 
 import java.awt.event.ActionListener;

@@ -1,4 +1,4 @@
-package guilayer;
+package guilayer.contentpanels;
 
 public interface ResetablePanel {
 

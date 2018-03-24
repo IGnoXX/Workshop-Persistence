@@ -8,7 +8,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import ctrllayer.CustomerController;
-import guilayer.ResetablePanel;
+import guilayer.contentpanels.ResetablePanel;
 import modlayer.Customer;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;

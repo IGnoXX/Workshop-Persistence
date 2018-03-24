@@ -11,7 +11,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 
 import ctrllayer.ProductController;
-import guilayer.ResetablePanel;
+import guilayer.contentpanels.ResetablePanel;
 import modlayer.Product;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
