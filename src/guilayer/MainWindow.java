@@ -20,10 +20,9 @@ public class MainWindow {
 	private static final int totalHeight = 500;
 	private static final int menuWidth = 200;
 	private static final int contentWidth = 600;
-	private static final int menuItemHeight = 64;
+	private static final int menuItemHeight = 48;
 	private static final Color menuFontColour = Color.WHITE;
 	private static final Color menuBackgroundColour = Color.DARK_GRAY;
-	private static final Color menuItemBackgroundColour = Color.DARK_GRAY;
 	private static final Color activeMenuItemBackgroundColour = Color.GRAY;
 	private static final Color activeMenuItemSignColour = Color.LIGHT_GRAY;
 	private static final Color contentFontColour = Color.DARK_GRAY;
@@ -67,13 +66,12 @@ public class MainWindow {
 		Menu menu = new Menu();
 		menu.setLayout(null);
 		menu.setBounds(0, 0, menuWidth, totalHeight);
+		menu.setItemHeight(menuItemHeight);
+		menu.setTextIndent(24);
 		menu.setBackground(menuBackgroundColour);
 		menu.setForeground(menuFontColour);
 		menu.setFont(menuFont);
-		menu.setItemHeight(menuItemHeight);
-		menu.setItemBackground(menuItemBackgroundColour);
-		menu.setActiveItemBackground(activeMenuItemBackgroundColour);
-		menu.setActiveSignBackground(activeMenuItemSignColour);
+		menu.setCurrentColour(activeMenuItemSignColour);
 		menu.add("Create Order");
 		menu.add("Manage Products");
 		menu.add("Manage Customers");
